@@ -1,0 +1,10 @@
+namespace Ersa.Mes.Middleware.Model;
+
+public enum Enum_TaskState
+{
+	TASKSTATE_DEFAULT = 200,
+	TASKSTATE_INITIALIZED,
+	TASKSTATE_STANDBY,
+	TASKSTATE_RUNNING,
+	TASKSTATE_CLOSED
+}

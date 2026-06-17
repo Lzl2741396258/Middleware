@@ -1,0 +1,36 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Ersa.Mes.Database.Model.EF_Ersasoft5;
+
+[Table("public.codeconfigurations")]
+public class codeconfiguration
+{
+	[Key]
+	[Column(Order = 0)]
+	[DatabaseGenerated(DatabaseGeneratedOption.None)]
+	public long arrayindex { get; set; }
+
+	[Key]
+	[Column(Order = 1)]
+	[DatabaseGenerated(DatabaseGeneratedOption.None)]
+	public long machineid { get; set; }
+
+	public bool? isconfigured { get; set; }
+
+	public bool? isactive { get; set; }
+
+	public long? location { get; set; }
+
+	public long? track { get; set; }
+
+	public long? codefunction { get; set; }
+
+	public bool? albfromelb { get; set; }
+
+	public bool? usealb { get; set; }
+
+	public bool? useelb { get; set; }
+
+	public long? timeout { get; set; }
+}

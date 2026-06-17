@@ -1,0 +1,32 @@
+2.Factory
+2-1.XPT_MesFunctionFactory
+
+2-2.XPT_MesTaskFactory
+
+9.Program
+  1.Set config contents
+
+9-1.Main:
+  1.SetControlButton
+  2.Overwrite Sub_InitializeMesTask(on Start action), other button click.  
+
+9-2.Start
+  1.Execute overwrited Sub_InitializeMesTask.
+  2.Sub_InitializeMesTask call XPT_MesTaskFactory, XPT_MesTaskFactory overwrite Sub_AddMesTaskReflow
+
+9-3.CustomButton:
+  1.Set Add ComboBox for SerialPorts
+  2.Timer start
+  3.Set value for each textbox
+  4.SerialPortReceived:
+    - Save into an variable for close serial
+  5.timer_Tick:
+    - Barcode textbox is not blank, and contains \r\n
+      - Get partNo from DB
+      - partNo > 20, stop. PartNo >= 8, cut first 8bits
+      - Get preResult with PreStation
+      - PreResult=OK & partNo >=8 OK
+        - Set Barcode to XPT_OutfeedCreateProtocolSelektiv.m_outcreateProtoclCode
+      - Other， NG
+      - Send barcode to Ersa(Serial)
+      

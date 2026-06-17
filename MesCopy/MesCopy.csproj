@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>MesCopy</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net472</TargetFramework>
+    <Prefer32Bit>True</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>11.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ersa.Mes.Common\Ersa.Mes.Common.csproj" />
+    <ProjectReference Include="..\Ersa.Mes.Database\Ersa.Mes.Database.csproj" />
+    <ProjectReference Include="..\Ersa.Mes.FileSystem\Ersa.Mes.FileSystem.csproj" />
+    <ProjectReference Include="..\Ersa.Mes.Logging\Ersa.Mes.Logging.csproj" />
+    <ProjectReference Include="..\Ersa.Mes.Middleware\Ersa.Mes.Middleware.csproj" />
+    <ProjectReference Include="..\Ersa.Mes.PLC\Ersa.Mes.PLC.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="AutoUpdater.NET">
+      <HintPath>bin\Debug\net472\AutoUpdater.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="BR.AN.PviServices">
+      <HintPath>bin\Debug\net472\BR.AN.PviServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Ersa.Mes.FileSystem\bin\Debug\net472\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+</Project>

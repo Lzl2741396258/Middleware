@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Ersa.Mes.PLC</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>11.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup>
+    <Reference Include="BR.AN.PviServices">
+      <HintPath>bin\Debug\net472\BR.AN.PviServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Ersa.Mes.Common">
+      <HintPath>bin\Debug\net472\Ersa.Mes.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Ersa.Mes.FileSystem">
+      <HintPath>bin\Debug\net472\Ersa.Mes.FileSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Ersa.Mes.Logging">
+      <HintPath>bin\Debug\net472\Ersa.Mes.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+</Project>
