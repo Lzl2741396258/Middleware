@@ -83,6 +83,16 @@ public class XPT_Config : Edc_ConfigBase
     [XmlElement("ITACUploadResultURL")]
     public string m_strITACUploadResultURL { get; set; }
 
+    // WCF ªª–Õ∑˛ŒÒ≈‰÷√
+    [XmlElement("ChangeOverServiceEnabled")]
+    public string m_strChangeOverServiceEnabled { get; set; } = "true";
+
+    [XmlElement("ChangeOverServiceIP")]
+    public string m_strChangeOverServiceIP { get; set; } = "127.0.0.1";
+
+    [XmlElement("ChangeOverServicePort")]
+    public int m_i32ChangeOverServicePort { get; set; } = 8080;
+
     // ADD BY Jaden
     public string m_ersaDownLineUrl { get; set; }
 

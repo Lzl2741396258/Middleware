@@ -7,6 +7,7 @@ using Ersa.Mes.Logging;
 using Ersa.Mes.Middleware;
 using MesXPT.Factory;
 using MesXPT.Model;
+using MesXPT.XPT_MesService;
 
 namespace MesXPT;
 
@@ -15,8 +16,9 @@ public class FrmMain : P_frmMain
 	private IContainer components = null;
 
 	private XPT_Config m_Config { get; set; }
+    private Edc_ChangeOverServiceHost m_ChangeOverServiceHost { get; set; }
 
-	public FrmMain(XPT_Config i_Config, Inf_Logger i_Logger)
+    public FrmMain(XPT_Config i_Config, Inf_Logger i_Logger)
 		: base(i_Config, i_Logger)
 	{
 		InitializeComponent();
@@ -31,10 +33,45 @@ public class FrmMain : P_frmMain
 		Sub_ControlTsbtn(i_Config.m_clsBasicSettings.m_i32MainFormLevel);
 		i_Logger.Debug(" ersa frmMain softName" + i_Config.m_clsBasicSettings.m_strSoftName);
 
+        // 启动 WCF 换型服务
+        StartChangeOverService(i_Config, i_Logger);
+
     }
 
-	// Overwrite Initialize (Fac & show)
-	protected override void Sub_InitializeMesTask()
+    private void StartChangeOverService(XPT_Config config, Inf_Logger logger)
+    {
+        try
+        {
+            bool isEnabled = bool.TryParse(config.m_strChangeOverServiceEnabled, out bool enabled) && enabled;
+            if (!isEnabled)
+            {
+                logger.Info("[WCF] ChangeOver Service is disabled");
+                return;
+            }
+
+            m_ChangeOverServiceHost = new Edc_ChangeOverServiceHost(config, logger);
+			string ip = string.IsNullOrEmpty(config.m_strChangeOverServiceIP) ? "127.0.0.1" : config.m_strChangeOverServiceIP;
+            // 订阅消息事件，转发到界面显示
+            m_ChangeOverServiceHost.OnShowMessage += base.Sub_ShowMessage;
+            int port = config.m_i32ChangeOverServicePort > 0 ? config.m_i32ChangeOverServicePort : 8080;
+
+            bool started = m_ChangeOverServiceHost.Start(ip, port);
+            if (started)
+            {
+                logger.Info("[WCF] ChangeOver Service started successfully");
+            }
+            else
+            {
+                logger.Error("[WCF] Failed to start ChangeOver Service");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"[WCF] Error starting ChangeOver Service: {ex.Message}", ex, "StartChangeOverService", 0);
+        }
+    }
+    // Overwrite Initialize (Fac & show)
+    protected override void Sub_InitializeMesTask()
 	{
 		m_edcTaskContainer = new XPT_MesTaskFactory(m_Config, base.m_edcLogger);
 		m_edcTaskContainer.Evt_ShowMessage += base.Sub_ShowMessage;

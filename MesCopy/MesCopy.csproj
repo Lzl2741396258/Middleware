@@ -37,8 +37,10 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Ersa.Mes.FileSystem\bin\Debug\net472\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
   </ItemGroup>
 </Project>
