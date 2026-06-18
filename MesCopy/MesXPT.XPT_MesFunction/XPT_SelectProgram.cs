@@ -22,7 +22,7 @@ public class XPT_SelectProgram : SelectProgram
 
 	private string m_strChangeoverProgram { get; set; }
 
-	public XPT_SelectProgram(XPT_Config i_Config, Inf_Logger i_edcLogger)
+	public XPT_SelectProgram(XPT_Config i_Config, Inf_Logger i_edcLogger) 
 		: base(i_Config.m_lstMesFunction, i_edcLogger)
 	{
 		m_Config = i_Config;
