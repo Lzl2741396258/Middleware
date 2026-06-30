@@ -121,6 +121,7 @@ public class XPT_Config : Edc_ConfigBase
 	public string m_programFilePath { get; set; }
 
 	public string m_side { get; set; }
+	public string m_byPass { get; set; }
 
     public XPT_Config()
 	{

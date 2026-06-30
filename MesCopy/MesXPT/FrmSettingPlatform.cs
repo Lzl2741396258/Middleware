@@ -41,43 +41,21 @@ public class FrmSettingPlatform : Form
 
     private StatusStrip statusStrip1;
 
-    private GroupBox groupBox1;
-
-    private Button m_btnSelectProgram;
-
-    private Label label1;
-
-    private TextBox m_txtLibrary;
-
-    private Label Line;
-
-    private TextBox m_Line;
-
-    private Label MachineCode;
-
-    private TextBox m_MachineCode;
-
-    private GroupBox groupBox4;
-
     private System.Windows.Forms.Timer timer1;
 
     private SerialPort serialPort1;
     private FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-    private CheckBox cbErsaDownline;
-    private TextBox tbErsaDownlineUrl;
-    private Label lbErsaDownlineURL;
     private TextBox tbErsaOnlineUrl;
-    private CheckBox cbChangeOver;
+    private Label lbErsaOnlineURL;
+    private CheckBox cbErsaDownline;
+    private Label lbErsaDownlineURL;
+    private TextBox tbErsaDownlineUrl;
     private Label label6;
     private Button btTest;
-    private Label lbErsaOnlineURL;
-    private Label Lane;
-    private TextBox m_Lane;
-    private TextBox m_Layer;
-    private Label Layer;
-    private CheckBox cbCompleted;
-    private TextBox tbCompletedUrl;
-    private Label IbCompleted;
+    private GroupBox groupBox4;
+    private TextBox m_MachineCode;
+    private Label MachineCode;
+    private CheckBox cbByPass;
 
     private XPT_Config m_Config { get; set; }
 
@@ -113,13 +91,7 @@ public class FrmSettingPlatform : Form
         timer1.Start();
 
         // Set value for each textbox.
-        m_Line.Text = m_Config.m_Account;
         m_MachineCode.Text = m_Config.m_RecipeName;
-        m_Lane.Text = m_Config.m_Lane;
-        m_Layer.Text = m_Config.m_Layer;
-        // m_tbxEquipNo.Text = m_Config.m_strEquipNo;
-        //m_comPort.Text = m_Config.m_strcomPort;
-        m_btnSelectProgram.Enabled = true;
         tbErsaDownlineUrl.Text = m_Config.m_ersaDownLineUrl;
 
         if (bool.TryParse(m_Config.m_checkCompeletResult, out bool compeletresult))
@@ -130,34 +102,21 @@ public class FrmSettingPlatform : Form
         {
             cbErsaDownline.Checked = false;
         }
-        if (bool.TryParse(m_Config.m_checkChangeOver, out bool changeOverResult))
+        if (bool.TryParse(m_Config.m_byPass, out bool byPass))
         {
-
-            cbChangeOver.Checked = changeOverResult;
-
+            cbByPass.Checked = byPass;
+            XPT_Data.m_byPass = true;
         }
         else
         {
-            cbChangeOver.Checked = false;
+            cbByPass.Checked = false;
+            XPT_Data.m_byPass = false;
         }
-        if (bool.TryParse(m_Config.m_completed, out bool completed))
-        {
 
-            cbCompleted.Checked = completed;
-
-        }
-        else
-        {
-            cbCompleted.Checked = false;
-        }
-        
         tbErsaOnlineUrl.Text = m_Config.m_ersaOnlineUrl;
-       // m_comPort.Text = m_Config.m_strcomPort;
-        m_txtLibrary.Text = m_Config.m_programFilePath;
-        tbCompletedUrl.Text = m_Config.m_completedUrl;
         base.Size = new Size
         {
-            Height = 600,
+            Height = 400,
             Width = 750
         };
     }
@@ -166,16 +125,11 @@ public class FrmSettingPlatform : Form
     {
         try
         {
-            m_Config.m_Account = m_Line.Text.Trim();
             m_Config.m_RecipeName = m_MachineCode.Text.Trim();
-            m_Config.m_Lane = m_Lane.Text.Trim();
-            m_Config.m_Layer = m_Layer.Text.Trim();
             m_Config.m_checkCompeletResult = cbErsaDownline.Checked.ToString();
             m_Config.m_ersaDownLineUrl = tbErsaDownlineUrl.Text.Trim();
             m_Config.m_ersaOnlineUrl = tbErsaOnlineUrl.Text.Trim();
-            m_Config.m_checkChangeOver = cbChangeOver.Checked.ToString();
-            m_Config.m_completedUrl = tbCompletedUrl.Text.Trim();
-            m_Config.m_completed = cbCompleted.Checked.ToString();
+            m_Config.m_byPass = cbByPass.Checked.ToString();
             XPT_Data.m_strProgram = m_Config.m_programFilePath;
 
             XPT_Data.m_Config = m_Config;
@@ -210,7 +164,6 @@ public class FrmSettingPlatform : Form
                 // 路劲下最新的那个程序文本
                 string programFile = programFiles[0];
                 XPT_Data.m_strProgram = Path.GetFileName(programFile);
-                m_txtLibrary.Text = Path.Combine(filePath, XPT_Data.m_strProgram);
             }
         }
 
@@ -267,34 +220,20 @@ public class FrmSettingPlatform : Form
             this.m_tsbtnSave = new System.Windows.Forms.ToolStripButton();
             this.m_tsbtnExit = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.m_btnSelectProgram = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.m_txtLibrary = new System.Windows.Forms.TextBox();
-            this.Line = new System.Windows.Forms.Label();
-            this.m_Line = new System.Windows.Forms.TextBox();
-            this.MachineCode = new System.Windows.Forms.Label();
-            this.m_MachineCode = new System.Windows.Forms.TextBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.tbCompletedUrl = new System.Windows.Forms.TextBox();
-            this.IbCompleted = new System.Windows.Forms.Label();
-            this.cbCompleted = new System.Windows.Forms.CheckBox();
-            this.m_Layer = new System.Windows.Forms.TextBox();
-            this.Layer = new System.Windows.Forms.Label();
-            this.Lane = new System.Windows.Forms.Label();
-            this.m_Lane = new System.Windows.Forms.TextBox();
-            this.btTest = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.cbChangeOver = new System.Windows.Forms.CheckBox();
-            this.tbErsaDownlineUrl = new System.Windows.Forms.TextBox();
-            this.lbErsaDownlineURL = new System.Windows.Forms.Label();
-            this.cbErsaDownline = new System.Windows.Forms.CheckBox();
             this.lbErsaOnlineURL = new System.Windows.Forms.Label();
             this.tbErsaOnlineUrl = new System.Windows.Forms.TextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.cbErsaDownline = new System.Windows.Forms.CheckBox();
+            this.lbErsaDownlineURL = new System.Windows.Forms.Label();
+            this.tbErsaDownlineUrl = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.btTest = new System.Windows.Forms.Button();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.MachineCode = new System.Windows.Forms.Label();
+            this.m_MachineCode = new System.Windows.Forms.TextBox();
+            this.cbByPass = new System.Windows.Forms.CheckBox();
             this.toolStrip1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -307,7 +246,7 @@ public class FrmSettingPlatform : Form
             this.toolStrip1.Location = new System.Drawing.Point(6, 3);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
-            this.toolStrip1.Size = new System.Drawing.Size(1384, 50);
+            this.toolStrip1.Size = new System.Drawing.Size(1384, 41);
             this.toolStrip1.TabIndex = 27;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -315,7 +254,7 @@ public class FrmSettingPlatform : Form
             // 
             this.m_tsbtnSave.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.m_tsbtnSave.Name = "m_tsbtnSave";
-            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 44);
+            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 35);
             this.m_tsbtnSave.Text = "Save";
             this.m_tsbtnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -324,7 +263,7 @@ public class FrmSettingPlatform : Form
             this.m_tsbtnExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.m_tsbtnExit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_tsbtnExit.Name = "m_tsbtnExit";
-            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 44);
+            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 35);
             this.m_tsbtnExit.Text = "退出";
             this.m_tsbtnExit.ToolTipText = "保存退出";
             this.m_tsbtnExit.Click += new System.EventHandler(this.m_tsbtnExit_Click);
@@ -332,244 +271,12 @@ public class FrmSettingPlatform : Form
             // statusStrip1
             // 
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusStrip1.Location = new System.Drawing.Point(6, 1066);
+            this.statusStrip1.Location = new System.Drawing.Point(6, 1101);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(4, 0, 20, 0);
             this.statusStrip1.Size = new System.Drawing.Size(1384, 22);
             this.statusStrip1.TabIndex = 28;
             this.statusStrip1.Text = "statusStrip1";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.m_btnSelectProgram);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.m_txtLibrary);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox1.Location = new System.Drawing.Point(6, 531);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(6);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(6);
-            this.groupBox1.Size = new System.Drawing.Size(1384, 230);
-            this.groupBox1.TabIndex = 52;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Select Program";
-            // 
-            // m_btnSelectProgram
-            // 
-            this.m_btnSelectProgram.Location = new System.Drawing.Point(836, 66);
-            this.m_btnSelectProgram.Margin = new System.Windows.Forms.Padding(6);
-            this.m_btnSelectProgram.Name = "m_btnSelectProgram";
-            this.m_btnSelectProgram.Size = new System.Drawing.Size(246, 46);
-            this.m_btnSelectProgram.TabIndex = 0;
-            this.m_btnSelectProgram.Text = "Select Program";
-            this.m_btnSelectProgram.UseVisualStyleBackColor = true;
-            this.m_btnSelectProgram.Click += new System.EventHandler(this.m_btnSelectProgram_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(102, 77);
-            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 24);
-            this.label1.TabIndex = 54;
-            this.label1.Text = "Library";
-            // 
-            // m_txtLibrary
-            // 
-            this.m_txtLibrary.Location = new System.Drawing.Point(216, 66);
-            this.m_txtLibrary.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-            this.m_txtLibrary.Name = "m_txtLibrary";
-            this.m_txtLibrary.Size = new System.Drawing.Size(596, 35);
-            this.m_txtLibrary.TabIndex = 53;
-            // 
-            // Line
-            // 
-            this.Line.AutoSize = true;
-            this.Line.Location = new System.Drawing.Point(90, 37);
-            this.Line.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.Line.Name = "Line";
-            this.Line.Size = new System.Drawing.Size(58, 24);
-            this.Line.TabIndex = 0;
-            this.Line.Text = "Line";
-            // 
-            // m_Line
-            // 
-            this.m_Line.Location = new System.Drawing.Point(191, 33);
-            this.m_Line.Margin = new System.Windows.Forms.Padding(2);
-            this.m_Line.Name = "m_Line";
-            this.m_Line.Size = new System.Drawing.Size(404, 35);
-            this.m_Line.TabIndex = 1;
-            // 
-            // MachineCode
-            // 
-            this.MachineCode.AutoSize = true;
-            this.MachineCode.Location = new System.Drawing.Point(654, 40);
-            this.MachineCode.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.MachineCode.Name = "MachineCode";
-            this.MachineCode.Size = new System.Drawing.Size(142, 24);
-            this.MachineCode.TabIndex = 2;
-            this.MachineCode.Text = "MachineCode";
-            this.MachineCode.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // m_MachineCode
-            // 
-            this.m_MachineCode.Location = new System.Drawing.Point(817, 37);
-            this.m_MachineCode.Margin = new System.Windows.Forms.Padding(2);
-            this.m_MachineCode.Name = "m_MachineCode";
-            this.m_MachineCode.Size = new System.Drawing.Size(404, 35);
-            this.m_MachineCode.TabIndex = 3;
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.tbCompletedUrl);
-            this.groupBox4.Controls.Add(this.IbCompleted);
-            this.groupBox4.Controls.Add(this.cbCompleted);
-            this.groupBox4.Controls.Add(this.m_Layer);
-            this.groupBox4.Controls.Add(this.Layer);
-            this.groupBox4.Controls.Add(this.Lane);
-            this.groupBox4.Controls.Add(this.m_Lane);
-            this.groupBox4.Controls.Add(this.btTest);
-            this.groupBox4.Controls.Add(this.label6);
-            this.groupBox4.Controls.Add(this.cbChangeOver);
-            this.groupBox4.Controls.Add(this.tbErsaDownlineUrl);
-            this.groupBox4.Controls.Add(this.lbErsaDownlineURL);
-            this.groupBox4.Controls.Add(this.cbErsaDownline);
-            this.groupBox4.Controls.Add(this.m_MachineCode);
-            this.groupBox4.Controls.Add(this.MachineCode);
-            this.groupBox4.Controls.Add(this.m_Line);
-            this.groupBox4.Controls.Add(this.Line);
-            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox4.Location = new System.Drawing.Point(6, 53);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(6, 3, 6, 3);
-            this.groupBox4.Size = new System.Drawing.Size(1384, 478);
-            this.groupBox4.TabIndex = 49;
-            this.groupBox4.TabStop = false;
-            // 
-            // tbCompletedUrl
-            // 
-            this.tbCompletedUrl.Location = new System.Drawing.Point(817, 238);
-            this.tbCompletedUrl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tbCompletedUrl.Name = "tbCompletedUrl";
-            this.tbCompletedUrl.Size = new System.Drawing.Size(402, 35);
-            this.tbCompletedUrl.TabIndex = 59;
-            // 
-            // IbCompleted
-            // 
-            this.IbCompleted.AutoSize = true;
-            this.IbCompleted.Location = new System.Drawing.Point(596, 245);
-            this.IbCompleted.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.IbCompleted.Name = "IbCompleted";
-            this.IbCompleted.Size = new System.Drawing.Size(202, 24);
-            this.IbCompleted.TabIndex = 58;
-            this.IbCompleted.Text = "ErsaCompletedURL";
-            // 
-            // cbCompleted
-            // 
-            this.cbCompleted.AutoSize = true;
-            this.cbCompleted.Location = new System.Drawing.Point(144, 245);
-            this.cbCompleted.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.cbCompleted.Name = "cbCompleted";
-            this.cbCompleted.Size = new System.Drawing.Size(150, 28);
-            this.cbCompleted.TabIndex = 57;
-            this.cbCompleted.Text = "Completed";
-            this.cbCompleted.UseVisualStyleBackColor = true;
-            // 
-            // m_Layer
-            // 
-            this.m_Layer.Location = new System.Drawing.Point(817, 88);
-            this.m_Layer.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.m_Layer.Name = "m_Layer";
-            this.m_Layer.Size = new System.Drawing.Size(404, 35);
-            this.m_Layer.TabIndex = 54;
-            // 
-            // Layer
-            // 
-            this.Layer.AutoSize = true;
-            this.Layer.Location = new System.Drawing.Point(704, 91);
-            this.Layer.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Layer.Name = "Layer";
-            this.Layer.Size = new System.Drawing.Size(70, 24);
-            this.Layer.TabIndex = 53;
-            this.Layer.Text = "Layer";
-            // 
-            // Lane
-            // 
-            this.Lane.AutoSize = true;
-            this.Lane.Location = new System.Drawing.Point(90, 88);
-            this.Lane.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Lane.Name = "Lane";
-            this.Lane.Size = new System.Drawing.Size(58, 24);
-            this.Lane.TabIndex = 52;
-            this.Lane.Text = "Lane";
-            // 
-            // m_Lane
-            // 
-            this.m_Lane.Location = new System.Drawing.Point(191, 88);
-            this.m_Lane.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.m_Lane.Name = "m_Lane";
-            this.m_Lane.Size = new System.Drawing.Size(404, 35);
-            this.m_Lane.TabIndex = 51;
-            // 
-            // btTest
-            // 
-            this.btTest.Location = new System.Drawing.Point(158, 357);
-            this.btTest.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btTest.Name = "btTest";
-            this.btTest.Size = new System.Drawing.Size(112, 37);
-            this.btTest.TabIndex = 49;
-            this.btTest.Text = "Test";
-            this.btTest.UseVisualStyleBackColor = true;
-            this.btTest.Click += new System.EventHandler(this.btTest_Click);
-            // 
-            // label6
-            // 
-            this.label6.Location = new System.Drawing.Point(0, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(100, 23);
-            this.label6.TabIndex = 50;
-            // 
-            // cbChangeOver
-            // 
-            this.cbChangeOver.AutoSize = true;
-            this.cbChangeOver.Location = new System.Drawing.Point(144, 292);
-            this.cbChangeOver.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.cbChangeOver.Name = "cbChangeOver";
-            this.cbChangeOver.Size = new System.Drawing.Size(162, 28);
-            this.cbChangeOver.TabIndex = 38;
-            this.cbChangeOver.Text = "ChangeOver";
-            this.cbChangeOver.UseVisualStyleBackColor = true;
-            // 
-            // tbErsaDownlineUrl
-            // 
-            this.tbErsaDownlineUrl.Location = new System.Drawing.Point(819, 190);
-            this.tbErsaDownlineUrl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tbErsaDownlineUrl.Name = "tbErsaDownlineUrl";
-            this.tbErsaDownlineUrl.Size = new System.Drawing.Size(406, 35);
-            this.tbErsaDownlineUrl.TabIndex = 37;
-            // 
-            // lbErsaDownlineURL
-            // 
-            this.lbErsaDownlineURL.AutoSize = true;
-            this.lbErsaDownlineURL.Location = new System.Drawing.Point(584, 199);
-            this.lbErsaDownlineURL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lbErsaDownlineURL.Name = "lbErsaDownlineURL";
-            this.lbErsaDownlineURL.Size = new System.Drawing.Size(214, 24);
-            this.lbErsaDownlineURL.TabIndex = 36;
-            this.lbErsaDownlineURL.Text = "ErsaCheckPointURL";
-            // 
-            // cbErsaDownline
-            // 
-            this.cbErsaDownline.AutoSize = true;
-            this.cbErsaDownline.Location = new System.Drawing.Point(144, 198);
-            this.cbErsaDownline.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.cbErsaDownline.Name = "cbErsaDownline";
-            this.cbErsaDownline.Size = new System.Drawing.Size(210, 28);
-            this.cbErsaDownline.TabIndex = 35;
-            this.cbErsaDownline.Text = "ErsaCheckPoint";
-            this.cbErsaDownline.UseVisualStyleBackColor = true;
             // 
             // lbErsaOnlineURL
             // 
@@ -589,12 +296,107 @@ public class FrmSettingPlatform : Form
             this.tbErsaOnlineUrl.Size = new System.Drawing.Size(402, 35);
             this.tbErsaOnlineUrl.TabIndex = 39;
             // 
+            // cbErsaDownline
+            // 
+            this.cbErsaDownline.AutoSize = true;
+            this.cbErsaDownline.Location = new System.Drawing.Point(140, 142);
+            this.cbErsaDownline.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cbErsaDownline.Name = "cbErsaDownline";
+            this.cbErsaDownline.Size = new System.Drawing.Size(210, 28);
+            this.cbErsaDownline.TabIndex = 35;
+            this.cbErsaDownline.Text = "ErsaCheckPoint";
+            this.cbErsaDownline.UseVisualStyleBackColor = true;
+            // 
+            // lbErsaDownlineURL
+            // 
+            this.lbErsaDownlineURL.AutoSize = true;
+            this.lbErsaDownlineURL.Location = new System.Drawing.Point(580, 143);
+            this.lbErsaDownlineURL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbErsaDownlineURL.Name = "lbErsaDownlineURL";
+            this.lbErsaDownlineURL.Size = new System.Drawing.Size(214, 24);
+            this.lbErsaDownlineURL.TabIndex = 36;
+            this.lbErsaDownlineURL.Text = "ErsaCheckPointURL";
+            // 
+            // tbErsaDownlineUrl
+            // 
+            this.tbErsaDownlineUrl.Location = new System.Drawing.Point(815, 134);
+            this.tbErsaDownlineUrl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tbErsaDownlineUrl.Name = "tbErsaDownlineUrl";
+            this.tbErsaDownlineUrl.Size = new System.Drawing.Size(406, 35);
+            this.tbErsaDownlineUrl.TabIndex = 37;
+            // 
+            // label6
+            // 
+            this.label6.Location = new System.Drawing.Point(0, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(100, 23);
+            this.label6.TabIndex = 50;
+            // 
+            // btTest
+            // 
+            this.btTest.Location = new System.Drawing.Point(145, 257);
+            this.btTest.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btTest.Name = "btTest";
+            this.btTest.Size = new System.Drawing.Size(112, 37);
+            this.btTest.TabIndex = 49;
+            this.btTest.Text = "Test";
+            this.btTest.UseVisualStyleBackColor = true;
+            this.btTest.Click += new System.EventHandler(this.btTest_Click);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.cbByPass);
+            this.groupBox4.Controls.Add(this.btTest);
+            this.groupBox4.Controls.Add(this.label6);
+            this.groupBox4.Controls.Add(this.tbErsaDownlineUrl);
+            this.groupBox4.Controls.Add(this.lbErsaDownlineURL);
+            this.groupBox4.Controls.Add(this.cbErsaDownline);
+            this.groupBox4.Controls.Add(this.m_MachineCode);
+            this.groupBox4.Controls.Add(this.MachineCode);
+            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox4.Location = new System.Drawing.Point(6, 44);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(6, 3, 6, 3);
+            this.groupBox4.Size = new System.Drawing.Size(1384, 522);
+            this.groupBox4.TabIndex = 49;
+            this.groupBox4.TabStop = false;
+            // 
+            // MachineCode
+            // 
+            this.MachineCode.AutoSize = true;
+            this.MachineCode.Location = new System.Drawing.Point(141, 45);
+            this.MachineCode.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.MachineCode.Name = "MachineCode";
+            this.MachineCode.Size = new System.Drawing.Size(142, 24);
+            this.MachineCode.TabIndex = 2;
+            this.MachineCode.Text = "MachineCode";
+            this.MachineCode.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // m_MachineCode
+            // 
+            this.m_MachineCode.Location = new System.Drawing.Point(304, 42);
+            this.m_MachineCode.Margin = new System.Windows.Forms.Padding(2);
+            this.m_MachineCode.Name = "m_MachineCode";
+            this.m_MachineCode.Size = new System.Drawing.Size(404, 35);
+            this.m_MachineCode.TabIndex = 3;
+            // 
+            // cbByPass
+            // 
+            this.cbByPass.AutoSize = true;
+            this.cbByPass.Location = new System.Drawing.Point(140, 193);
+            this.cbByPass.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cbByPass.Name = "cbByPass";
+            this.cbByPass.Size = new System.Drawing.Size(114, 28);
+            this.cbByPass.TabIndex = 51;
+            this.cbByPass.Text = "ByPass";
+            this.cbByPass.UseVisualStyleBackColor = true;
+            // 
             // FrmSettingPlatform
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1396, 1091);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(1396, 1126);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
@@ -607,8 +409,6 @@ public class FrmSettingPlatform : Form
             this.Load += new System.EventHandler(this.FrmSettingTcpip_Load);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);

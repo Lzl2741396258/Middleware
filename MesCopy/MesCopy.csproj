@@ -29,10 +29,16 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="AutoUpdater.NET">
-      <HintPath>bin\Debug\net472\AutoUpdater.NET.dll</HintPath>
+      <HintPath>..\..\AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="BR.AN.PviServices">
-      <HintPath>bin\Debug\net472\BR.AN.PviServices.dll</HintPath>
+      <HintPath>..\..\BR.AN.PviServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Excetec.LicenseVaild">
+      <HintPath>..\..\..\..\MES-KBR开发\回流焊-选择焊标准版\Excetec.LicenseVaild.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Ersa.Mes.FileSystem\bin\Debug\net472\Newtonsoft.Json.dll</HintPath>

@@ -62,7 +62,7 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
             m_edcLogger.Info(" 条码 : " + base.m_Request.ma_edcIdentifier[0].m_strValue);
             OnShowMessage(Enum_LogType.Info, "条码： " + base.m_Request.ma_edcIdentifier[0].m_strValue);
 
-            SendProgram(base.m_Request.m_sttSolderingProgram.m_strName);
+           // SendProgram(base.m_Request.m_sttSolderingProgram.m_strName);
 
 
             if (string.IsNullOrEmpty(base.m_Request.ma_edcIdentifier[0].m_strValue) || XPT_Data.m_byPass)
@@ -94,77 +94,45 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
 
                 XPT_Data.m_blnActiveSelectProgram = false;
                 XPT_Data.m_result = false;
-                bool isChangeOver = bool.TryParse(m_Config.m_checkChangeOver, out bool checkChangeOver) && checkChangeOver;
-                if (isChangeOver)
+                OnShowMessage(Enum_LogType.Info, "上个流程执行结果: " + XPT_Data.m_result + m_Config.m_strCode + base.r_enuComingRelease);
+                //
+                var request = new ReadBarcode
                 {
-                    if (m_Config.m_ErsachooseRecipe)
-                    {
-                        base.r_edcResult = new Edc_Result
-                        {
-                            m_enuResultCode = Enum_ResponseCode.ok
-                        };
-                        OnShowMessage(Enum_LogType.Info, "设备执行换型操作换型成功允许进板" );
+                    Ib_Code = base.m_Request.ma_edcIdentifier[0].m_strValue,
+                    Dev_Code = m_Config.m_RecipeName
+                };
 
-                    }
-                    else
-                    {
+                string jsonRequest = JsonConvert.SerializeObject(request);
+                m_edcLogger.Info($"MoveInVerify Request: {jsonRequest}");
+                OnShowMessage(Enum_LogType.Info, $"发送进站请求: {base.m_Request.ma_edcIdentifier[0].m_strValue}");
 
-                        base.r_edcResult = new Edc_Result
-                        {
-                            m_enuResultCode = Enum_ResponseCode.fehler
-                        };
-                        OnShowMessage(Enum_LogType.Info, "软件勾选换型选项但未执行换型接口");
-                    }
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                int iTimtout = 5000;
+                var response = HTTPComm.Post(m_Config.m_ersaDownLineUrl, jsonRequest, iTimtout);
+                m_edcLogger.Info($"MoveInVerify Response: {response}");
+
+                Response result = GetResponse(response);
+                if (result.Code == "0")
+                {
+                    base.r_edcResult = new Edc_Result
+                    {
+                        m_enuResultCode = Enum_ResponseCode.ok
+                    };
+                    OnShowMessage(Enum_LogType.Info, "Release Infeed  sucess: " + m_Config.m_strCode + base.r_enuComingRelease);
+
                 }
                 else
                 {
-                    OnShowMessage(Enum_LogType.Info, "上个流程执行结果: " + XPT_Data.m_result + m_Config.m_strCode + base.r_enuComingRelease);
-                    //
-                    var request = new MoveInVerifyRequest
+
+                    base.r_edcResult = new Edc_Result
                     {
-                        CommandType = "BarcodeCheck",
-                        LocalTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                        Line = m_Config.m_Account,
-                        MachineCode = m_Config.m_RecipeName,
-                        Barcode = base.m_Request.ma_edcIdentifier[0].m_strValue,
-                        Lane = m_Config.m_Lane,
-                        Layer = m_Config.m_Layer
+                        m_enuResultCode = Enum_ResponseCode.fehler
                     };
 
-                    string jsonRequest = JsonConvert.SerializeObject(request);
-                    m_edcLogger.Info($"MoveInVerify Request: {jsonRequest}");
-                    OnShowMessage(Enum_LogType.Info, $"发送进站请求: {base.m_Request.ma_edcIdentifier[0].m_strValue}");
+                    //base.r_enuComingRelease = Enum_ComingRelease.transfer;
+                    OnShowMessage(Enum_LogType.Info, result.Message);
+                    OnShowMessage(Enum_LogType.Info, "Release Infeed  fail: " + m_Config.m_strCode + base.r_enuComingRelease);
 
-                    var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-                    int iTimtout = 5000;
-                    var response = HTTPComm.Post(m_Config.m_ersaDownLineUrl, jsonRequest, iTimtout);
-                    //string responseJson = response.Content.ReadAsStringAsync();
-                    m_edcLogger.Info($"MoveInVerify Response: {response}");
-
-                    var result = JsonConvert.DeserializeObject<MoveInVerifyResponse>(response);
-                    if (result.ValueReturn=="0")
-                    {
-                        base.r_edcResult = new Edc_Result
-                        {
-                            m_enuResultCode = Enum_ResponseCode.ok
-                        };
-                        OnShowMessage(Enum_LogType.Info, "Release Infeed  sucess: " + m_Config.m_strCode + base.r_enuComingRelease);
-
-                    }
-                    else
-                    {
-
-                        base.r_edcResult = new Edc_Result
-                        {
-                            m_enuResultCode = Enum_ResponseCode.fehler
-                        };
-
-                        //base.r_enuComingRelease = Enum_ComingRelease.transfer;
-
-                        OnShowMessage(Enum_LogType.Info, "Release Infeed  fail: " + m_Config.m_strCode + base.r_enuComingRelease);
-
-
-                    }
                 }
             }
 
@@ -180,9 +148,9 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
         return Task.CompletedTask;
     }
 
-    private XPT_ersaOnlineResponse GetResponse(string message)
+    private Response GetResponse(string message)
     {
-        return JsonConvert.DeserializeObject<XPT_ersaOnlineResponse>(message);
+        return JsonConvert.DeserializeObject<Response>(message);
     }
 
     private void SendProgram(string program)

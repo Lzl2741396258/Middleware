@@ -6,6 +6,7 @@ using Ersa.Mes.Common.Helper;
 using Ersa.Mes.FileSystem.Model;
 using Ersa.Mes.Logging;
 using Ersa.Mes.Middleware.Global;
+using Excetec.LicenseVaild;
 using MesXPT.Model;
 
 namespace MesXPT;
@@ -15,7 +16,16 @@ internal static class Program
 	[STAThread]
 	private static void Main()
 	{
-		Application.ThreadException += Form_UIThreadException;
+#if !DEBUG
+        var (isValid, message) = ExcetecLicenseManager.IsLicenseValid();
+
+        if (!isValid)
+        {
+            MessageBox.Show($"软件未授权：{message}\n请联系管理员获取License", "授权失败");
+            Environment.Exit(0); // 直接关闭软件
+        }
+#endif
+        Application.ThreadException += Form_UIThreadException;
 		Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 		Application.EnableVisualStyles();

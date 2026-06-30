@@ -27,7 +27,7 @@ public class FrmMain : P_frmMain
 			Height = 800
 		};
 		base.StartPosition = FormStartPosition.CenterScreen;
-		Text = $"{i_Config.m_clsBasicSettings.m_strSoftName} v{Assembly.GetExecutingAssembly().GetName().Version}";
+		Text = $"ErsaMesMiddleware_DingYi v{Assembly.GetExecutingAssembly().GetName().Version}";
 		Sub_ControlTsbtn(i_Config.m_clsBasicSettings.m_i32MainFormLevel);
 		i_Logger.Debug(" ersa frmMain softName" + i_Config.m_clsBasicSettings.m_strSoftName);
 
