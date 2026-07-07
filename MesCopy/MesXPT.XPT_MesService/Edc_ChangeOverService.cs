@@ -118,7 +118,7 @@ namespace MesXPT.XPT_MesService
                 // 设置全局程序名（触发换型）
                 XPT_Data.m_strProgram = request.ProgramName;
                 m_Config.m_ErsachooseRecipe = true;
-
+                XPT_Data.m_blnActiveSelectProgram = true;
                 // 更新当前程序记录
                 _currentProgram = request.ProgramName;
 

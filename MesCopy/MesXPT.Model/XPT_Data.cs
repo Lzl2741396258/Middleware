@@ -14,7 +14,7 @@ public static class XPT_Data
 
 	public static Enum_OEECode m_enuOeeState = Enum_OEECode.NichtDefiniert;
 
-	public static bool m_blnActiveSelectProgram = false;
+	public static volatile bool m_blnActiveSelectProgram = false;
 
 	public static string m_strLibrary = string.Empty;
 

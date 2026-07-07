@@ -6,6 +6,7 @@ using Ersa.Mes.Common.Helper;
 using Ersa.Mes.FileSystem.Model;
 using Ersa.Mes.Logging;
 using Ersa.Mes.Middleware.Global;
+using Excetec.LicenseVaild;
 using MesXPT.Model;
 
 namespace MesXPT;
@@ -15,7 +16,17 @@ internal static class Program
 	[STAThread]
 	private static void Main()
 	{
-		Application.ThreadException += Form_UIThreadException;
+
+        //var (isValid, message) = ExcetecLicenseManager.IsLicenseValid();
+        //if (!isValid)
+        //{
+        //    string uuid = ExcetecLicenseManager.GetDeviceId();
+        //    MessageBox.Show($"{message}\n…Ë±∏ID: {uuid}");
+        //    Clipboard.Clear();
+        //    Clipboard.SetText(uuid);
+        //    return;
+        //}
+        Application.ThreadException += Form_UIThreadException;
 		Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 		Application.EnableVisualStyles();

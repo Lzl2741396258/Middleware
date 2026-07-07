@@ -197,27 +197,28 @@ public class XPT_ChooseRecipe : ChooseRecipe
                         m_Config.m_ErsachooseRecipe = true;
                         XPT_Data.m_strProgram = programName;
                         OnShowMessage(Enum_LogType.Info, $"生成程序名称: {XPT_Data.m_strProgram}");
+
+                        XPT_Data.m_result = true;
+                        base.r_edcResult = new Edc_Result
+                        {
+                            m_enuResultCode = Enum_ResponseCode.ok,
+                            m_strText = "进站校验成功"
+                        };
+                        //XPT_Data.m_strProgram = "2025"/;
+                        base.r_strCurrentRecipe = XPT_Data.m_strProgram;
+                        // 记录程序名更换成功信息
+                        OnShowMessage(Enum_LogType.Info, $"程序名更换成功，程序: {XPT_Data.m_strProgram}");
+                        m_edcLogger.Info($"程序名更换成功,程序: {XPT_Data.m_strProgram}");
                     }
                     else
                     {
-                        XPT_Data.m_strProgram = "";
                         m_edcLogger.Info($"返回程序名为空");
                         OnShowMessage(Enum_LogType.Error, "返回程序名为空");
                     }
                     //XPT_Data.m_blnActiveSelectProgram = true;
                     //XPT_Data.m_result = true;
 
-                    XPT_Data.m_result = true;
-                    base.r_edcResult = new Edc_Result
-                    {
-                        m_enuResultCode = Enum_ResponseCode.ok,
-                        m_strText = "进站校验成功"
-                    };
-                    //XPT_Data.m_strProgram = "2025"/;
-                    base.r_strCurrentRecipe = XPT_Data.m_strProgram;
-                    // 记录程序名更换成功信息
-                    OnShowMessage(Enum_LogType.Info, $"程序名更换成功，程序: {XPT_Data.m_strProgram}");
-                    m_edcLogger.Info($"程序名更换成功,程序: {XPT_Data.m_strProgram}");
+                    
                 }
             }
         }

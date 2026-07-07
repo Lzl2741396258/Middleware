@@ -15,6 +15,7 @@
   <PropertyGroup>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <RootNamespace />
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -33,6 +34,9 @@
     </Reference>
     <Reference Include="BR.AN.PviServices">
       <HintPath>bin\Debug\net472\BR.AN.PviServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Excetec.LicenseVaild">
+      <HintPath>dll\Excetec.LicenseVaild.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Ersa.Mes.FileSystem\bin\Debug\net472\Newtonsoft.Json.dll</HintPath>
