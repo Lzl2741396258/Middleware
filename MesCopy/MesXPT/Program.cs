@@ -16,7 +16,8 @@ internal static class Program
 	[STAThread]
 	private static void Main()
 	{
-        var (isValid, message) = ExcetecLicenseManager.IsLicenseValid();
+#if !DEBUG
+		var (isValid, message) = ExcetecLicenseManager.IsLicenseValid();
         if (!isValid)
         {
             string uuid = ExcetecLicenseManager.GetDeviceId();
@@ -25,7 +26,8 @@ internal static class Program
             Clipboard.SetText(uuid);
             return;
         }
-        Application.ThreadException += Form_UIThreadException;
+#endif
+		Application.ThreadException += Form_UIThreadException;
 		Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 		Application.EnableVisualStyles();
