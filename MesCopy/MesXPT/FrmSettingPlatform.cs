@@ -230,9 +230,9 @@ public class FrmSettingPlatform : Form
             this.label6 = new System.Windows.Forms.Label();
             this.btTest = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.MachineCode = new System.Windows.Forms.Label();
-            this.m_MachineCode = new System.Windows.Forms.TextBox();
             this.cbByPass = new System.Windows.Forms.CheckBox();
+            this.m_MachineCode = new System.Windows.Forms.TextBox();
+            this.MachineCode = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.SuspendLayout();
@@ -246,7 +246,7 @@ public class FrmSettingPlatform : Form
             this.toolStrip1.Location = new System.Drawing.Point(6, 3);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
-            this.toolStrip1.Size = new System.Drawing.Size(1384, 41);
+            this.toolStrip1.Size = new System.Drawing.Size(1384, 50);
             this.toolStrip1.TabIndex = 27;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -254,7 +254,7 @@ public class FrmSettingPlatform : Form
             // 
             this.m_tsbtnSave.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.m_tsbtnSave.Name = "m_tsbtnSave";
-            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 35);
+            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 44);
             this.m_tsbtnSave.Text = "Save";
             this.m_tsbtnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -263,7 +263,7 @@ public class FrmSettingPlatform : Form
             this.m_tsbtnExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.m_tsbtnExit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_tsbtnExit.Name = "m_tsbtnExit";
-            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 35);
+            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 44);
             this.m_tsbtnExit.Text = "退出";
             this.m_tsbtnExit.ToolTipText = "保存退出";
             this.m_tsbtnExit.Click += new System.EventHandler(this.m_tsbtnExit_Click);
@@ -354,32 +354,13 @@ public class FrmSettingPlatform : Form
             this.groupBox4.Controls.Add(this.m_MachineCode);
             this.groupBox4.Controls.Add(this.MachineCode);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox4.Location = new System.Drawing.Point(6, 44);
+            this.groupBox4.Location = new System.Drawing.Point(6, 53);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(6, 3, 6, 3);
             this.groupBox4.Size = new System.Drawing.Size(1384, 522);
             this.groupBox4.TabIndex = 49;
             this.groupBox4.TabStop = false;
-            // 
-            // MachineCode
-            // 
-            this.MachineCode.AutoSize = true;
-            this.MachineCode.Location = new System.Drawing.Point(141, 45);
-            this.MachineCode.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.MachineCode.Name = "MachineCode";
-            this.MachineCode.Size = new System.Drawing.Size(142, 24);
-            this.MachineCode.TabIndex = 2;
-            this.MachineCode.Text = "MachineCode";
-            this.MachineCode.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // m_MachineCode
-            // 
-            this.m_MachineCode.Location = new System.Drawing.Point(304, 42);
-            this.m_MachineCode.Margin = new System.Windows.Forms.Padding(2);
-            this.m_MachineCode.Name = "m_MachineCode";
-            this.m_MachineCode.Size = new System.Drawing.Size(404, 35);
-            this.m_MachineCode.TabIndex = 3;
             // 
             // cbByPass
             // 
@@ -391,6 +372,25 @@ public class FrmSettingPlatform : Form
             this.cbByPass.TabIndex = 51;
             this.cbByPass.Text = "ByPass";
             this.cbByPass.UseVisualStyleBackColor = true;
+            // 
+            // m_MachineCode
+            // 
+            this.m_MachineCode.Location = new System.Drawing.Point(304, 42);
+            this.m_MachineCode.Margin = new System.Windows.Forms.Padding(2);
+            this.m_MachineCode.Name = "m_MachineCode";
+            this.m_MachineCode.Size = new System.Drawing.Size(404, 35);
+            this.m_MachineCode.TabIndex = 3;
+            // 
+            // MachineCode
+            // 
+            this.MachineCode.AutoSize = true;
+            this.MachineCode.Location = new System.Drawing.Point(141, 45);
+            this.MachineCode.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.MachineCode.Name = "MachineCode";
+            this.MachineCode.Size = new System.Drawing.Size(142, 24);
+            this.MachineCode.TabIndex = 2;
+            this.MachineCode.Text = "MachineCode";
+            this.MachineCode.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // FrmSettingPlatform
             // 
@@ -416,19 +416,14 @@ public class FrmSettingPlatform : Form
 
     }
 
-    private async Task<MoveInVerifyResponse> MoveInVerifyAsync(string messn)
+    private async Task<Response> MoveInVerifyAsync(string messn)
     {
         try
         {
-            var request = new MoveInVerifyRequest
+            var request = new ReadBarcode
             {
-                CommandType = "BarcodeCheck",
-                LocalTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                Line = m_Config.m_Line,
-                MachineCode = m_Config.m_MachineCode,
-                Barcode = m_Config.m_Barcode,
-                Lane = m_Config.m_Lane,
-                Layer = m_Config.m_Layer
+                Ib_Code = messn,
+                Dev_Code = m_Config.m_RecipeName
             };
 
             string jsonRequest = JsonConvert.SerializeObject(request);
@@ -452,10 +447,10 @@ public class FrmSettingPlatform : Form
                 catch (OperationCanceledException)
                 {
                     // 处理超时
-                    return new MoveInVerifyResponse
+                    return new Response
                     {
                         Message = $"请求超时（{timeout}ms）",
-                        ValueReturn = "408"
+                        Code = "408"
                     };
                 }
 
@@ -463,7 +458,7 @@ public class FrmSettingPlatform : Form
                 string responseJson = await response.Content.ReadAsStringAsync();
                 m_edcLogger.Info($"MoveInVerify Response: {responseJson}");
 
-                var result = JsonConvert.DeserializeObject<MoveInVerifyResponse>(responseJson);
+                var result = JsonConvert.DeserializeObject<Response>(responseJson);
 
                 return result;
             }
@@ -473,10 +468,10 @@ public class FrmSettingPlatform : Form
             m_edcLogger.Error($"HTTP请求异常: {ex.Message}", ex, "MoveInVerifyAsync", 0);
             MessageBox.Show($"进站接口调用失败: {ex.Message}");
 
-            return new MoveInVerifyResponse
+            return new Response
             {
                 Message = $"HTTP请求错误: {ex.Message}",
-                ValueReturn = "500"
+                Code = "500"
             };
         }
         catch (Exception ex)
@@ -484,33 +479,33 @@ public class FrmSettingPlatform : Form
             m_edcLogger.Error($"MoveInVerify Error: {ex.Message}", ex, "MoveInVerifyAsync", 0);
             MessageBox.Show($"进站接口调用失败: {ex.Message}");
 
-            return new MoveInVerifyResponse
+            return new Response
             {
                 Message = $"接口调用异常: {ex.Message}",
-                ValueReturn = "500"
+                Code = "500"
             };
         }
     }
 
     private async void btTest_Click(object sender, EventArgs e)
     {
-        //// 测试用的序列号，您可以根据需要修改
-        //string testSN = "211102600047901618XKN03AAH";
+        // 测试用的序列号，您可以根据需要修改
+        string testSN = "211102600047901618XKN03AAH";
 
-        //var response = await MoveInVerifyAsync(testSN);
+        var response = await MoveInVerifyAsync(testSN);
 
-        //if (response.IsSuccessStatusCode)
-        //{
-        //    MessageBox.Show($"进站校验成功!\nMessage: {response.Message}\n工单: {response.Data?.BelongWipOrderModel?.WipOrderNo}");
-        //}
-        //else
-        //{
-        //    MessageBox.Show($"进站校验失败!\nError: {response.Message}\nCode: {response.Result}");
-        //}
+        if (response.Code == "0")
+        {
+            MessageBox.Show($"进站校验成功!\nMessage: {response.Message}\nCode: {response}");
+        }
+        else
+        {
+            MessageBox.Show($"进站校验失败!\nError: {response.Message}\nCode: {response.Code}");
+        }
 
-        //int iTimtout = 50000;
+        int iTimtout = 50000;
 
-        SendProgram("3608937XXX02A-NIO-AE_TOP");
+        //SendProgram("3608937XXX02A-NIO-AE_TOP");
 
     }
 

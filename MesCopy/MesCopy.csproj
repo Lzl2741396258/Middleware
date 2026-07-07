@@ -35,7 +35,7 @@
       <HintPath>..\..\BR.AN.PviServices.dll</HintPath>
     </Reference>
     <Reference Include="Excetec.LicenseVaild">
-      <HintPath>..\..\..\..\MES-KBR开发\回流焊-选择焊标准版\Excetec.LicenseVaild.dll</HintPath>
+      <HintPath>License\Excetec.LicenseVaild.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\log4net.dll</HintPath>
