@@ -43,11 +43,11 @@ public class FrmSettingPlatform : Form
 
     private GroupBox groupBox1;
 
-    private Button m_btnSelectProgram;
+    private Button m_btnSelectPath;
 
     private Label label1;
 
-    private TextBox m_txtLibrary;
+    private TextBox m_txtFilePath;
 
     private Label Line;
 
@@ -78,6 +78,8 @@ public class FrmSettingPlatform : Form
     private CheckBox cbCompleted;
     private TextBox tbCompletedUrl;
     private Label IbCompleted;
+    private TextBox tbLibrary;
+    private Label lbLibrary;
 
     private XPT_Config m_Config { get; set; }
 
@@ -119,7 +121,7 @@ public class FrmSettingPlatform : Form
         m_Layer.Text = m_Config.m_Layer;
         // m_tbxEquipNo.Text = m_Config.m_strEquipNo;
         //m_comPort.Text = m_Config.m_strcomPort;
-        m_btnSelectProgram.Enabled = true;
+        m_btnSelectPath.Enabled = true;
         tbErsaDownlineUrl.Text = m_Config.m_ersaDownLineUrl;
 
         if (bool.TryParse(m_Config.m_checkCompeletResult, out bool compeletresult))
@@ -153,8 +155,9 @@ public class FrmSettingPlatform : Form
         
         tbErsaOnlineUrl.Text = m_Config.m_ersaOnlineUrl;
        // m_comPort.Text = m_Config.m_strcomPort;
-        m_txtLibrary.Text = m_Config.m_programFilePath;
+        m_txtFilePath.Text = m_Config.m_txtFilePath;
         tbCompletedUrl.Text = m_Config.m_completedUrl;
+        tbLibrary.Text = m_Config.m_txtLibrary;
         base.Size = new Size
         {
             Height = 600,
@@ -176,7 +179,9 @@ public class FrmSettingPlatform : Form
             m_Config.m_checkChangeOver = cbChangeOver.Checked.ToString();
             m_Config.m_completedUrl = tbCompletedUrl.Text.Trim();
             m_Config.m_completed = cbCompleted.Checked.ToString();
-            XPT_Data.m_strProgram = m_Config.m_programFilePath;
+            m_Config.m_txtFilePath = m_txtFilePath.Text.Trim();
+            m_Config.m_txtLibrary = tbLibrary.Text.Trim();
+            //XPT_Data.m_strProgram = m_Config.m_programFilePath;
 
             XPT_Data.m_Config = m_Config;
             bool result = Edc_OperationConfig.Fun_WriteConfig<XPT_Config>(m_Config.m_edcFilesPath.m_strPathConfig, m_Config);
@@ -195,30 +200,31 @@ public class FrmSettingPlatform : Form
         Close();
     }
 
-    private void m_btnSelectProgram_Click(object sender, EventArgs e)
+    private void m_btnSelectPath_Click(object sender, EventArgs e)
     {
 
         DialogResult dr = folderBrowserDialog.ShowDialog();
+        m_txtFilePath.Text = folderBrowserDialog.SelectedPath;
 
-        if (dr.ToString() == "OK")
-        {
-            string filePath = folderBrowserDialog.SelectedPath;
-            XPT_Data.m_strLibrary = filePath;
-            string[] programFiles = Directory.GetFiles(filePath);
-            if (programFiles.Length > 0)
-            {
-                // 路劲下最新的那个程序文本
-                string programFile = programFiles[0];
-                XPT_Data.m_strProgram = Path.GetFileName(programFile);
-                m_txtLibrary.Text = Path.Combine(filePath, XPT_Data.m_strProgram);
-            }
-        }
+        //if (dr.ToString() == "OK")
+        //{
+        //    string filePath = folderBrowserDialog.SelectedPath;
+        //    XPT_Data.m_strLibrary = filePath;
+        //    string[] programFiles = Directory.GetFiles(filePath);
+        //    if (programFiles.Length > 0)
+        //    {
+        //        // 路劲下最新的那个程序文本
+        //        string programFile = programFiles[0];
+        //        XPT_Data.m_strProgram = Path.GetFileName(programFile);
+        //        m_txtLibrary.Text = Path.Combine(filePath, XPT_Data.m_strProgram);
+        //    }
+        //}
 
         //   XPT_Data.m_strProgram = m_txtProgram.Text.Trim();
-        if (MessageBox.Show("Confirm select program " + XPT_Data.m_strLibrary + "\\" + XPT_Data.m_strProgram, "Confirm", MessageBoxButtons.OKCancel) == DialogResult.OK)
-        {
-            XPT_Data.m_blnActiveSelectProgram = true;
-        }
+        //if (MessageBox.Show("Confirm select program " + XPT_Data.m_strLibrary + "\\" + XPT_Data.m_strProgram, "Confirm", MessageBoxButtons.OKCancel) == DialogResult.OK)
+        //{
+        //    XPT_Data.m_blnActiveSelectProgram = true;  
+        //}
     }
 
     /*    private void m_btnPopupDialog_Click(object sender, EventArgs e)
@@ -268,9 +274,9 @@ public class FrmSettingPlatform : Form
             this.m_tsbtnExit = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.m_btnSelectProgram = new System.Windows.Forms.Button();
+            this.m_btnSelectPath = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.m_txtLibrary = new System.Windows.Forms.TextBox();
+            this.m_txtFilePath = new System.Windows.Forms.TextBox();
             this.Line = new System.Windows.Forms.Label();
             this.m_Line = new System.Windows.Forms.TextBox();
             this.MachineCode = new System.Windows.Forms.Label();
@@ -293,6 +299,8 @@ public class FrmSettingPlatform : Form
             this.tbErsaOnlineUrl = new System.Windows.Forms.TextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.tbLibrary = new System.Windows.Forms.TextBox();
+            this.lbLibrary = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -315,7 +323,7 @@ public class FrmSettingPlatform : Form
             // 
             this.m_tsbtnSave.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.m_tsbtnSave.Name = "m_tsbtnSave";
-            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 44);
+            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 35);
             this.m_tsbtnSave.Text = "Save";
             this.m_tsbtnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -324,7 +332,7 @@ public class FrmSettingPlatform : Form
             this.m_tsbtnExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.m_tsbtnExit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_tsbtnExit.Name = "m_tsbtnExit";
-            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 44);
+            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 35);
             this.m_tsbtnExit.Text = "退出";
             this.m_tsbtnExit.ToolTipText = "保存退出";
             this.m_tsbtnExit.Click += new System.EventHandler(this.m_tsbtnExit_Click);
@@ -341,9 +349,9 @@ public class FrmSettingPlatform : Form
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.m_btnSelectProgram);
+            this.groupBox1.Controls.Add(this.m_btnSelectPath);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.m_txtLibrary);
+            this.groupBox1.Controls.Add(this.m_txtFilePath);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Location = new System.Drawing.Point(6, 531);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(6);
@@ -352,36 +360,36 @@ public class FrmSettingPlatform : Form
             this.groupBox1.Size = new System.Drawing.Size(1384, 230);
             this.groupBox1.TabIndex = 52;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Select Program";
+            this.groupBox1.Text = "Select Path";
             // 
-            // m_btnSelectProgram
+            // m_btnSelectPath
             // 
-            this.m_btnSelectProgram.Location = new System.Drawing.Point(836, 66);
-            this.m_btnSelectProgram.Margin = new System.Windows.Forms.Padding(6);
-            this.m_btnSelectProgram.Name = "m_btnSelectProgram";
-            this.m_btnSelectProgram.Size = new System.Drawing.Size(246, 46);
-            this.m_btnSelectProgram.TabIndex = 0;
-            this.m_btnSelectProgram.Text = "Select Program";
-            this.m_btnSelectProgram.UseVisualStyleBackColor = true;
-            this.m_btnSelectProgram.Click += new System.EventHandler(this.m_btnSelectProgram_Click);
+            this.m_btnSelectPath.Location = new System.Drawing.Point(836, 66);
+            this.m_btnSelectPath.Margin = new System.Windows.Forms.Padding(6);
+            this.m_btnSelectPath.Name = "m_btnSelectPath";
+            this.m_btnSelectPath.Size = new System.Drawing.Size(246, 46);
+            this.m_btnSelectPath.TabIndex = 0;
+            this.m_btnSelectPath.Text = "Select Path";
+            this.m_btnSelectPath.UseVisualStyleBackColor = true;
+            this.m_btnSelectPath.Click += new System.EventHandler(this.m_btnSelectPath_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(102, 77);
+            this.label1.Location = new System.Drawing.Point(90, 66);
             this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 24);
+            this.label1.Size = new System.Drawing.Size(106, 24);
             this.label1.TabIndex = 54;
-            this.label1.Text = "Library";
+            this.label1.Text = "FilePath";
             // 
-            // m_txtLibrary
+            // m_txtFilePath
             // 
-            this.m_txtLibrary.Location = new System.Drawing.Point(216, 66);
-            this.m_txtLibrary.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-            this.m_txtLibrary.Name = "m_txtLibrary";
-            this.m_txtLibrary.Size = new System.Drawing.Size(596, 35);
-            this.m_txtLibrary.TabIndex = 53;
+            this.m_txtFilePath.Location = new System.Drawing.Point(216, 66);
+            this.m_txtFilePath.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
+            this.m_txtFilePath.Name = "m_txtFilePath";
+            this.m_txtFilePath.Size = new System.Drawing.Size(596, 35);
+            this.m_txtFilePath.TabIndex = 53;
             // 
             // Line
             // 
@@ -422,6 +430,8 @@ public class FrmSettingPlatform : Form
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.tbLibrary);
+            this.groupBox4.Controls.Add(this.lbLibrary);
             this.groupBox4.Controls.Add(this.tbCompletedUrl);
             this.groupBox4.Controls.Add(this.IbCompleted);
             this.groupBox4.Controls.Add(this.cbCompleted);
@@ -515,7 +525,7 @@ public class FrmSettingPlatform : Form
             // 
             // btTest
             // 
-            this.btTest.Location = new System.Drawing.Point(158, 357);
+            this.btTest.Location = new System.Drawing.Point(144, 347);
             this.btTest.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btTest.Name = "btTest";
             this.btTest.Size = new System.Drawing.Size(112, 37);
@@ -588,6 +598,24 @@ public class FrmSettingPlatform : Form
             this.tbErsaOnlineUrl.Name = "tbErsaOnlineUrl";
             this.tbErsaOnlineUrl.Size = new System.Drawing.Size(402, 35);
             this.tbErsaOnlineUrl.TabIndex = 39;
+            // 
+            // tbLibrary
+            // 
+            this.tbLibrary.Location = new System.Drawing.Point(817, 292);
+            this.tbLibrary.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tbLibrary.Name = "tbLibrary";
+            this.tbLibrary.Size = new System.Drawing.Size(402, 35);
+            this.tbLibrary.TabIndex = 61;
+            // 
+            // lbLibrary
+            // 
+            this.lbLibrary.AutoSize = true;
+            this.lbLibrary.Location = new System.Drawing.Point(702, 303);
+            this.lbLibrary.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbLibrary.Name = "lbLibrary";
+            this.lbLibrary.Size = new System.Drawing.Size(94, 24);
+            this.lbLibrary.TabIndex = 60;
+            this.lbLibrary.Text = "Library";
             // 
             // FrmSettingPlatform
             // 

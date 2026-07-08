@@ -119,6 +119,8 @@ public class XPT_Config : Edc_ConfigBase
     public string m_ersaOnlineUrl { get; set; }
     public string m_completedUrl { get; set; }
     public string m_completed { get; set; }
+    public string m_txtLibrary { get; set; }
+    public string m_txtFilePath { get; set; }
 
     public string m_checkChangeOver { get; set; }
 
