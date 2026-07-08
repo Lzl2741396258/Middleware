@@ -64,6 +64,9 @@ namespace MesXPT.XPT_MesService
                     HelpEnabled = true
                 });
 
+                // 添加 CORS 支持
+                endpoint.Behaviors.Add(new Edc_CorsEndpointBehavior());
+
                 // 启用元数据
                 var smb = new ServiceMetadataBehavior
                 {

@@ -78,7 +78,7 @@ namespace MesXPT.XPT_MesService
                     }
 
                     // 检查当前程序是否相同
-                    if (_currentProgram == request.ProgramName)
+                    if (XPT_Data.m_strProgram == request.ProgramName)
                     {
                         return LogAndReturn(Edc_ChangeOverResponse.NoChangeRequired("Consistent With Current Program"));
                     }
@@ -121,12 +121,11 @@ namespace MesXPT.XPT_MesService
             {
                 m_Logger.Info($"[WCF] JobChange Start: Lane={request.LaneNo}, Program={request.ProgramName}");
 
+                XPT_Data.m_blnActiveSelectProgram = true;
+
                 XPT_Data.m_strLibrary = m_Config.m_txtLibrary;
                 XPT_Data.m_strProgram = request.ProgramName;
 
-                XPT_Data.m_blnActiveSelectProgram = true;
-                // 更新当前程序记录
-                _currentProgram = request.ProgramName;
 
                 m_Logger.Info($"[WCF] JobChange Success: Program={request.ProgramName}");
                 OnShowMessage(Enum_LogType.Info, "换型成功： " + request.ProgramName);
