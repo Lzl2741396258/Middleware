@@ -34,8 +34,6 @@ namespace MesXPT.XPT_MesService
                 httpResponse.Headers.Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
                 // 允许的请求头
                 httpResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization");
-                // 预检请求缓存时间（秒）
-                httpResponse.Headers.Add("Access-Control-Max-Age", "3600");
 
                 // 如果是 OPTIONS 预检请求，直接返回 200 状态码
                 if (correlationState is string state && state == "OPTIONS")

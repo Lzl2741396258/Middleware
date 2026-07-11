@@ -1,13 +1,15 @@
-using System;
-using System.Threading;
-using System.Windows.Forms;
+using Autofac;
 using AutoUpdaterDotNET;
 using Ersa.Mes.Common.Helper;
 using Ersa.Mes.FileSystem.Model;
 using Ersa.Mes.Logging;
 using Ersa.Mes.Middleware.Global;
 using Excetec.LicenseVaild;
+using Helpers;
 using MesXPT.Model;
+using System;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace MesXPT;
 
@@ -51,6 +53,15 @@ internal static class Program
 		}
 		AutoStart edc_AutoStart = new AutoStart();
 		edc_AutoStart.Sub_SetAutoStart(m_Config.m_clsBasicSettings.m_blnWindowsStartup);
+
+		ContainerManager.Instance.Register(a => { 
+			a.RegisterInstance(m_Config).AsSelf().SingleInstance();
+			a.RegisterInstance(m_edcLogger).As<Inf_Logger>().SingleInstance();
+
+        });
+        ContainerManager.Instance.Build();
+
+        Application.ApplicationExit += Application_ApplicationExit;
 		if (Edc_Global.Fun_blnAppRunning(Application.ProductName))
 		{
 			MessageBox.Show("System is already running...");
@@ -61,7 +72,12 @@ internal static class Program
 		}
 	}
 
-	private static void Form_UIThreadException(object sender, ThreadExceptionEventArgs t)
+    private static void Application_ApplicationExit(object sender, EventArgs e)
+    {
+        WebServer.Instance.StopWebServer();
+    }
+
+    private static void Form_UIThreadException(object sender, ThreadExceptionEventArgs t)
 	{
 		MessageBox.Show("Sorry, your operation has not been completed, please restart the software and try again...");
 	}

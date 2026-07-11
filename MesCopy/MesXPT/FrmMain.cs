@@ -1,13 +1,14 @@
+using Ersa.Mes.Logging;
+using Ersa.Mes.Middleware;
+using Helpers;
+using MesXPT.Factory;
+using MesXPT.Model;
+using MesXPT.XPT_MesService;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
-using Ersa.Mes.Logging;
-using Ersa.Mes.Middleware;
-using MesXPT.Factory;
-using MesXPT.Model;
-using MesXPT.XPT_MesService;
 
 namespace MesXPT;
 
@@ -34,8 +35,14 @@ public class FrmMain : P_frmMain
 		i_Logger.Debug(" ersa frmMain softName" + i_Config.m_clsBasicSettings.m_strSoftName);
 
         // 启动 WCF 换型服务
-        StartChangeOverService(i_Config, i_Logger);
+        //StartChangeOverService(i_Config, i_Logger);
+        Load += FrmMain_Load;
+        WebServer.Instance.StartWebServer();
 
+    }
+
+    private void FrmMain_Load(object sender, EventArgs e)
+    {
     }
 
     private void StartChangeOverService(XPT_Config config, Inf_Logger logger)

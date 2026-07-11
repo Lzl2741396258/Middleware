@@ -282,6 +282,8 @@ public class FrmSettingPlatform : Form
             this.MachineCode = new System.Windows.Forms.Label();
             this.m_MachineCode = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.tbLibrary = new System.Windows.Forms.TextBox();
+            this.lbLibrary = new System.Windows.Forms.Label();
             this.tbCompletedUrl = new System.Windows.Forms.TextBox();
             this.IbCompleted = new System.Windows.Forms.Label();
             this.cbCompleted = new System.Windows.Forms.CheckBox();
@@ -299,8 +301,6 @@ public class FrmSettingPlatform : Form
             this.tbErsaOnlineUrl = new System.Windows.Forms.TextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.tbLibrary = new System.Windows.Forms.TextBox();
-            this.lbLibrary = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -323,7 +323,7 @@ public class FrmSettingPlatform : Form
             // 
             this.m_tsbtnSave.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.m_tsbtnSave.Name = "m_tsbtnSave";
-            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 35);
+            this.m_tsbtnSave.Size = new System.Drawing.Size(72, 44);
             this.m_tsbtnSave.Text = "Save";
             this.m_tsbtnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -332,7 +332,7 @@ public class FrmSettingPlatform : Form
             this.m_tsbtnExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.m_tsbtnExit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_tsbtnExit.Name = "m_tsbtnExit";
-            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 35);
+            this.m_tsbtnExit.Size = new System.Drawing.Size(66, 44);
             this.m_tsbtnExit.Text = "退出";
             this.m_tsbtnExit.ToolTipText = "保存退出";
             this.m_tsbtnExit.Click += new System.EventHandler(this.m_tsbtnExit_Click);
@@ -457,6 +457,24 @@ public class FrmSettingPlatform : Form
             this.groupBox4.Size = new System.Drawing.Size(1384, 478);
             this.groupBox4.TabIndex = 49;
             this.groupBox4.TabStop = false;
+            // 
+            // tbLibrary
+            // 
+            this.tbLibrary.Location = new System.Drawing.Point(817, 292);
+            this.tbLibrary.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tbLibrary.Name = "tbLibrary";
+            this.tbLibrary.Size = new System.Drawing.Size(402, 35);
+            this.tbLibrary.TabIndex = 61;
+            // 
+            // lbLibrary
+            // 
+            this.lbLibrary.AutoSize = true;
+            this.lbLibrary.Location = new System.Drawing.Point(702, 303);
+            this.lbLibrary.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbLibrary.Name = "lbLibrary";
+            this.lbLibrary.Size = new System.Drawing.Size(94, 24);
+            this.lbLibrary.TabIndex = 60;
+            this.lbLibrary.Text = "Library";
             // 
             // tbCompletedUrl
             // 
@@ -598,24 +616,6 @@ public class FrmSettingPlatform : Form
             this.tbErsaOnlineUrl.Name = "tbErsaOnlineUrl";
             this.tbErsaOnlineUrl.Size = new System.Drawing.Size(402, 35);
             this.tbErsaOnlineUrl.TabIndex = 39;
-            // 
-            // tbLibrary
-            // 
-            this.tbLibrary.Location = new System.Drawing.Point(817, 292);
-            this.tbLibrary.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tbLibrary.Name = "tbLibrary";
-            this.tbLibrary.Size = new System.Drawing.Size(402, 35);
-            this.tbLibrary.TabIndex = 61;
-            // 
-            // lbLibrary
-            // 
-            this.lbLibrary.AutoSize = true;
-            this.lbLibrary.Location = new System.Drawing.Point(702, 303);
-            this.lbLibrary.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lbLibrary.Name = "lbLibrary";
-            this.lbLibrary.Size = new System.Drawing.Size(94, 24);
-            this.lbLibrary.TabIndex = 60;
-            this.lbLibrary.Text = "Library";
             // 
             // FrmSettingPlatform
             // 
@@ -866,9 +866,7 @@ public class FrmSettingPlatform : Form
 
                 string type = string.Empty;
 
-                //string source = m_Config.m_side;
-
-                string source = "TOP";
+                string source = string.IsNullOrEmpty(m_Config.m_Layer) ? "BOT" : m_Config.m_Layer;
 
                 if (source.Equals("TOP", StringComparison.OrdinalIgnoreCase))
                 {

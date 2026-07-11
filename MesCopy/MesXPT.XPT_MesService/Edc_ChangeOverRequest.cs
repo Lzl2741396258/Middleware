@@ -10,16 +10,16 @@ namespace MesXPT.XPT_MesService
     [DataContract]
     public class Edc_ChangeOverRequest
     {
-        [DataMember(Name = "LineNo")]
+        [DataMember(Name = "lineNo")]
         public string LineNo { get; set; }
 
-        [DataMember(Name = "MachineNo")]
+        [DataMember(Name = "machineNo")]
         public string MachineNo { get; set; }
 
-        [DataMember(Name = "LaneNo")]
+        [DataMember(Name = "laneNo")]
         public string LaneNo { get; set; }
 
-        [DataMember(Name = "ProgramName")]
+        [DataMember(Name = "programName")]
         public string ProgramName { get; set; }
     }
 }

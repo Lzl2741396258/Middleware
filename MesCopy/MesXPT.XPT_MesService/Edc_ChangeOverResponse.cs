@@ -10,13 +10,13 @@ namespace MesXPT.XPT_MesService
     [DataContract]
     public class Edc_ChangeOverResponse
     {
-        [DataMember(Name = "Code")]
+        [DataMember(Name = "code")]
         public int Code { get; set; }
 
-        [DataMember(Name = "Message")]
+        [DataMember(Name = "message")]
         public string Message { get; set; }
 
-        [DataMember(Name = "Data")]
+        [DataMember(Name = "data")]
         public int Data { get; set; }
 
         public static Edc_ChangeOverResponse Success()
@@ -49,7 +49,7 @@ namespace MesXPT.XPT_MesService
             };
         }
 
-        public static Edc_ChangeOverResponse NoChangeRequired(string message = "No Changeover Required")
+        public static Edc_ChangeOverResponse NoChangeRequired(string message)
         {
             return new Edc_ChangeOverResponse
             {

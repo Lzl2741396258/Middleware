@@ -20,6 +20,8 @@ public static class XPT_Data
 
 	public static string m_strProgram = string.Empty;
 
+	public static string m_strCurrentDeviceProgram = string.Empty;
+
 	public static bool m_blnActivePopupDialog = false;
 
 	public static string m_strAlarmMessage = "";

@@ -1,20 +1,21 @@
-﻿using Ersa.Mes.Logging;
+﻿using Autofac;
+using Ersa.Mes.Logging;
+using Helpers;
 using MesXPT.Model;
+using MesXPT.XPT_MesService;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Windows.Forms;
 
-namespace MesXPT.XPT_MesService
+namespace Controllers
 {
-    //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public class Edc_ChangeOverService : Inf_IChangeOverService
+    public class ExcetecChangeOversController : ApiController
     {
         private static readonly object _jobLock = new object();
         private static bool _isJobChanging = false;
@@ -25,12 +26,21 @@ namespace MesXPT.XPT_MesService
 
         // 消息显示事件（用于通知界面）
         public event Action<Enum_LogType, string> ShowMessage;
-
-        public Edc_ChangeOverService(XPT_Config config, Inf_Logger logger)
+        public ExcetecChangeOversController()
         {
-            m_Config = config;
-            m_Logger = logger;
+            m_Config = ContainerManager.Instance.Default.Resolve<XPT_Config>();
+            m_Logger = ContainerManager.Instance.Default.Resolve<Inf_Logger>();
+           
         }
+
+
+        [HttpGet]
+        public string Status()
+        {
+            return "GOOD";
+        }
+
+       
 
         /// <summary>
         /// 显示消息到界面
@@ -39,7 +49,7 @@ namespace MesXPT.XPT_MesService
         {
             ShowMessage?.Invoke(i_enuLogType, i_strMessage);
         }
-
+        [HttpPost]
         public Edc_ChangeOverResponse AutoChange(Edc_ChangeOverRequest request)
         {
             try
@@ -64,6 +74,10 @@ namespace MesXPT.XPT_MesService
                 //{
                 //    return LogAndReturn(Edc_ChangeOverResponse.Fail("Could Not Find Job File: " + request.ProgramName));
                 //}
+                //if (m_Config.m_RecipeName != request.MachineNo)
+                //{
+                //    return LogAndReturn(Edc_ChangeOverResponse.Fail("MahcineCode mismatch,current: " + m_Config.m_RecipeName));
+                //}
 
                 // 互斥锁检查
                 lock (_jobLock)
@@ -74,8 +88,17 @@ namespace MesXPT.XPT_MesService
                     }
 
                     // 检查当前程序是否相同
-                    if (XPT_Data.m_strProgram == request.ProgramName)
+                    m_Logger.Info($"Current Program: {XPT_Data.m_strCurrentDeviceProgram}");
+                    if (XPT_Data.m_strCurrentDeviceProgram == request.ProgramName)
                     {
+                        string path = m_Config.m_txtFilePath;
+                        bool fileExists = Directory.GetFiles(path, "rel0*").Any();
+                        if (!fileExists)
+                        {
+                            // 没有该文件，则执行写入操作
+                            SendProgram(request.ProgramName);
+                        }
+
                         return LogAndReturn(Edc_ChangeOverResponse.NoChangeRequired("Consistent With Current Program No Changeover Required"));
                     }
 
@@ -127,7 +150,7 @@ namespace MesXPT.XPT_MesService
                 OnShowMessage(Enum_LogType.Info, "换型成功： " + request.ProgramName);
                 result.Message = "Job Change Success";
                 result.Data = 0;
-                SendProgram(request.ProgramName);
+                //SendProgram(request.ProgramName);
             }
             catch (Exception ex)
             {
@@ -153,23 +176,11 @@ namespace MesXPT.XPT_MesService
 
             try
             {
-                //string strProgram = XPT_Data.m_strProgram;
-
-                //if (program != strProgram)
-                //{
-                //    string errorMsg = $"程序换型检测到不一致！当前程序：{program}，上一次程序：{strProgram}。流程已中断，禁止继续执行。";
-                //    MessageBox.Show(errorMsg);
-                //    return;
-                //}
 
                 MessageBox.Show("PROGRAM： " + program);
 
 
-                //  m_edcLogger.Info(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "程序名 ： " + program);
-                //  OnShowMessage(Enum_LogType.Info, "PROGRAM： " + program + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "和上一笔程序一样未换型，不生成新文件");
-
-
-                string path = m_Config.m_programFilePath;
+                string path = m_Config.m_txtFilePath;
 
                 // 获取当前日期
                 DateTime currentDate = DateTime.Now;
@@ -193,14 +204,6 @@ namespace MesXPT.XPT_MesService
 
                 if (!string.IsNullOrEmpty(ChangeProgram))
                 {
-                    //3608937XXX02A-NIO-AE_TOP ProductNo:3608937XXX02A-NIO  ProductVersion:AE  PCBSurfaceID:TOP
-                    //string[] prog = ChangeProgram.Split('-');
-                    //string type = string.Empty;
-                    //if (prog.Length > 2)
-                    //{
-                    //    string source = prog[2];
-                    //    type = new string(source.Take(1).ToArray());
-                    //}
 
                     string type = string.Empty;
 
