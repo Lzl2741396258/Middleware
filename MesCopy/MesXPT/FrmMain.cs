@@ -38,7 +38,8 @@ public class FrmMain : P_frmMain
         //StartChangeOverService(i_Config, i_Logger);
         Load += FrmMain_Load;
         WebServer.Instance.StartWebServer();
-
+        // 注册跨组件消息事件
+        XPT_Data.Evt_ShowMessage += base.Sub_ShowMessage;
     }
 
     private void FrmMain_Load(object sender, EventArgs e)

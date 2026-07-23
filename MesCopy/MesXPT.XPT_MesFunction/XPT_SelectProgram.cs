@@ -88,19 +88,18 @@ public class XPT_SelectProgram : SelectProgram
 	protected override Task Fun_blnConnectMesPlatform()
 	{
 		base.m_edcLogger.Debug("Begin " + MethodBase.GetCurrentMethod().DeclaringType.Name + "." + MethodBase.GetCurrentMethod().Name + "...", null, "Fun_blnConnectMesPlatform", 114);
-        OnShowMessage(Enum_LogType.Info, "选择程序接口");
+        //OnShowMessage(Enum_LogType.Info, "选择程序接口");
         if (m_Response.m_sttResult.m_enuCode == Enum_SolderingProgramErrorCode.Ok)
 		{
 			OnShowMessage(Enum_LogType.Info, "Ersasoft->Recived select program " + m_Response.m_sttSolderingProgram.m_strLibrary + "\\" + m_Response.m_sttSolderingProgram.m_strName);
-			XPT_Data.m_strCurrentDeviceProgram = m_Response.m_sttSolderingProgram.m_strName;
-            SendProgram(XPT_Data.m_strCurrentDeviceProgram);
+
+            SendProgram(XPT_Data.m_strProgram);
+            XPT_Data.m_strProgram = string.Empty;
         }
 		else
 		{
 			OnShowMessage(Enum_LogType.Error, "Ersasoft->select program error...Details:" + m_Response.m_sttResult.m_strText);
-            XPT_Data.m_strCurrentDeviceProgram = string.Empty;
-
-
+            
         }
 		return Task.FromResult(result: true);
 	}
@@ -119,7 +118,7 @@ public class XPT_SelectProgram : SelectProgram
             //    return;
             //}
 
-            MessageBox.Show("PROGRAM： " + program);
+            OnShowMessage(Enum_LogType.Info, "PROGRAM：" + program);
 
 
             //  m_edcLogger.Info(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "程序名 ： " + program);
@@ -135,7 +134,7 @@ public class XPT_SelectProgram : SelectProgram
             // 完整文件路径
             string filePath = Path.Combine(path, fileName);
 
-            MessageBox.Show("PROGRAM 路径： " + filePath);
+            OnShowMessage(Enum_LogType.Info, "PROGRAM 路径：" + filePath);
 
             // 数据要写入的内容
             string[] headers = new string[]
@@ -186,7 +185,7 @@ public class XPT_SelectProgram : SelectProgram
                     writer.WriteLine($"{ChangeProgram},{trackNumber},{side}");
                 }
 
-                MessageBox.Show("处理 程序写入文件成功 ！");
+                OnShowMessage(Enum_LogType.Info, "处理 程序写入文件成功 ！");
             }
         }
         catch (Exception ex)

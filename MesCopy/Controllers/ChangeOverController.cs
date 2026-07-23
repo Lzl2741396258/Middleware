@@ -24,6 +24,7 @@ namespace Controllers
         private XPT_Config m_Config { get; set; }
         private Inf_Logger m_Logger { get; set; }
 
+
         // 消息显示事件（用于通知界面）
         public event Action<Enum_LogType, string> ShowMessage;
         public ExcetecChangeOversController()
@@ -42,13 +43,6 @@ namespace Controllers
 
        
 
-        /// <summary>
-        /// 显示消息到界面
-        /// </summary>
-        private void OnShowMessage(Enum_LogType i_enuLogType, string i_strMessage)
-        {
-            ShowMessage?.Invoke(i_enuLogType, i_strMessage);
-        }
         [HttpPost]
         public Edc_ChangeOverResponse AutoChange(Edc_ChangeOverRequest request)
         {
@@ -88,19 +82,20 @@ namespace Controllers
                     }
 
                     // 检查当前程序是否相同
-                    m_Logger.Info($"Current Program: {XPT_Data.m_strCurrentDeviceProgram}");
-                    if (XPT_Data.m_strCurrentDeviceProgram == request.ProgramName)
-                    {
-                        string path = m_Config.m_txtFilePath;
-                        bool fileExists = Directory.GetFiles(path, "rel0*").Any();
-                        if (!fileExists)
-                        {
-                            // 没有该文件，则执行写入操作
-                            SendProgram(request.ProgramName);
-                        }
+                    //m_Logger.Info($"Current Program: {XPT_Data.m_strCurrentDeviceProgram}");
+                    //XPT_Data.ShowMessage(Enum_LogType.Info, "当前程序名： " + XPT_Data.m_strCurrentDeviceProgram);
+                    //if (XPT_Data.m_strCurrentDeviceProgram == request.ProgramName)
+                    //{
+                    //    string path = m_Config.m_txtFilePath;
+                    //    bool fileExists = Directory.GetFiles(path, "rel0*").Any();
+                    //    if (!fileExists)
+                    //    {
+                    //        // 没有该文件，则执行写入操作
+                    //        SendProgram(request.ProgramName);
+                    //    }
 
-                        return LogAndReturn(Edc_ChangeOverResponse.NoChangeRequired("Consistent With Current Program No Changeover Required"));
-                    }
+                    //    return LogAndReturn(Edc_ChangeOverResponse.NoChangeRequired("Consistent With Current Program No Changeover Required"));
+                    //}
 
                     _isJobChanging = true;
                 }
@@ -147,7 +142,7 @@ namespace Controllers
 
 
                 m_Logger.Info($"[WCF] JobChange Success: Program={request.ProgramName}");
-                OnShowMessage(Enum_LogType.Info, "换型成功： " + request.ProgramName);
+                XPT_Data.ShowMessage(Enum_LogType.Info, "下发程序名： " + request.ProgramName);
                 result.Message = "Job Change Success";
                 result.Data = 0;
                 //SendProgram(request.ProgramName);
@@ -155,7 +150,7 @@ namespace Controllers
             catch (Exception ex)
             {
                 m_Logger.Error($"[WCF] JobChange Exception: {ex.Message}", ex, "ExecuteChangeOver", 0);
-                OnShowMessage(Enum_LogType.Error, "换型失败： " + ex.Message);
+                XPT_Data.ShowMessage(Enum_LogType.Error, "换型失败： " + ex.Message);
                 result.Code = 1000;
                 result.Message = "JobChange Exception: " + ex.Message;
             }

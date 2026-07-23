@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Ersa.Mes.FileSystem.Model.RequestResponse;
+using Ersa.Mes.Logging;
 using Ersa.Mes.PLC.Model;
 
 namespace MesXPT.Model;
@@ -36,5 +38,14 @@ public static class XPT_Data
 	public static XPT_Config m_Config { get; set; }
 
 	public static List<Struct_ProcessParameter> m_lstErsaData { get; set; } = new List<Struct_ProcessParameter>();
+
+    // 静态事件：用于跨组件发送消息到界面
+    public static event Action<Enum_LogType, string> Evt_ShowMessage;
+
+    // 触发消息显示
+    public static void ShowMessage(Enum_LogType logType, string message)
+    {
+        Evt_ShowMessage?.Invoke(logType, message);
+    }
 
 }

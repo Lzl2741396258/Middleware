@@ -738,7 +738,7 @@ public class FrmSettingPlatform : Form
 
         //int iTimtout = 50000;
 
-        SendProgram("3608937XXX02A-NIO-AE_TOP");
+        //SendProgram("3608937XXX02A-NIO-AE_TOP");
 
     }
 
