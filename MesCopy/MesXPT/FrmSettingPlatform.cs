@@ -39,6 +39,8 @@ public class FrmSettingPlatform : Form
 
     private ToolStripButton m_tsbtnSave;
 
+    private ToolStripButton m_tsbtnSerialConfig;
+
     private StatusStrip statusStrip1;
 
     private System.Windows.Forms.Timer timer1;
@@ -132,6 +134,10 @@ public class FrmSettingPlatform : Form
             m_Config.m_byPass = cbByPass.Checked.ToString();
             XPT_Data.m_strProgram = m_Config.m_programFilePath;
 
+            // 串口配置由弹窗内已临时写入 m_Config，这里统一落地
+            // m_Config.m_strcomPort / m_strBaudRate / m_strDataBits / m_strStopBits
+            // m_Config.m_strParity / m_strPrefix / m_strSuffix / m_strTriggerChar
+
             XPT_Data.m_Config = m_Config;
             bool result = Edc_OperationConfig.Fun_WriteConfig<XPT_Config>(m_Config.m_edcFilesPath.m_strPathConfig, m_Config);
             MessageBox.Show($"Save Config File {result}...");
@@ -147,6 +153,21 @@ public class FrmSettingPlatform : Form
     private void m_tsbtnExit_Click(object sender, EventArgs e)
     {
         Close();
+    }
+
+    private void m_tsbtnSerialConfig_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            using (FrmSerialPortConfig frm = new FrmSerialPortConfig(m_Config, serialPort1, m_edcLogger))
+            {
+                frm.ShowDialog(this);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("打开串口配置失败: " + ex.Message);
+        }
     }
 
     private void m_btnSelectProgram_Click(object sender, EventArgs e)
@@ -218,6 +239,7 @@ public class FrmSettingPlatform : Form
             this.components = new System.ComponentModel.Container();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.m_tsbtnSave = new System.Windows.Forms.ToolStripButton();
+            this.m_tsbtnSerialConfig = new System.Windows.Forms.ToolStripButton();
             this.m_tsbtnExit = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lbErsaOnlineURL = new System.Windows.Forms.Label();
@@ -242,6 +264,7 @@ public class FrmSettingPlatform : Form
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(38, 38);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbtnSave,
+            this.m_tsbtnSerialConfig,
             this.m_tsbtnExit});
             this.toolStrip1.Location = new System.Drawing.Point(6, 3);
             this.toolStrip1.Name = "toolStrip1";
@@ -251,13 +274,21 @@ public class FrmSettingPlatform : Form
             this.toolStrip1.Text = "toolStrip1";
             // 
             // m_tsbtnSave
-            // 
+            //
             this.m_tsbtnSave.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.m_tsbtnSave.Name = "m_tsbtnSave";
             this.m_tsbtnSave.Size = new System.Drawing.Size(72, 44);
             this.m_tsbtnSave.Text = "Save";
             this.m_tsbtnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
+            //
+            // m_tsbtnSerialConfig
+            //
+            this.m_tsbtnSerialConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_tsbtnSerialConfig.Name = "m_tsbtnSerialConfig";
+            this.m_tsbtnSerialConfig.Size = new System.Drawing.Size(96, 44);
+            this.m_tsbtnSerialConfig.Text = "串口配置";
+            this.m_tsbtnSerialConfig.Click += new System.EventHandler(this.m_tsbtnSerialConfig_Click);
+            //
             // m_tsbtnExit
             // 
             this.m_tsbtnExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -490,186 +521,114 @@ public class FrmSettingPlatform : Form
     private async void btTest_Click(object sender, EventArgs e)
     {
         // 测试用的序列号，您可以根据需要修改
-        string testSN = "211102600047901618XKN03AAH";
-
-        var response = await MoveInVerifyAsync(testSN);
-
-        if (response.Code == "0")
-        {
-            MessageBox.Show($"进站校验成功!\nMessage: {response.Message}\nCode: {response}");
-        }
-        else
-        {
-            MessageBox.Show($"进站校验失败!\nError: {response.Message}\nCode: {response.Code}");
-        }
-
-        int iTimtout = 50000;
-
-        //SendProgram("3608937XXX02A-NIO-AE_TOP");
-
-    }
-
-    private void SendProgram(string program)
-    {
-        #region 旧代码
-        //try
-        //{
-
-        //    //   OnShowMessage(Enum_LogType.Info, "PROGRAM： " + program);
-
-        //    //if (program.Equals(lastChangeProgram))
-        //    //{
-        //    //    m_edcLogger.Info(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "和上一笔程序一样未换型，不生成新文件");
-        //    //    OnShowMessage(Enum_LogType.Info, "PROGRAM： " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "和上一笔程序一样未换型，不生成新文件");
-        //    //}
-
-        //    string path = @"D:\Test\ERSA";
-
-        //    // 获取当前日期
-        //    DateTime currentDate = DateTime.Now;
-        //    string fileName = $"rel0_{currentDate:yyyyMMddHHmmss}.csv"; // 例如：20230928_data.csv
-
-        //    // 完整文件路径
-        //    string filePath = Path.Combine(path, fileName);
-
-        //    // 数据要写入的内容
-        //    string[] headers = new string[]
-        //    {
-        //    "Program",
-        //    "TrackNumber",
-        //    "Side"
-        //    };
-
-        //    // 变量赋值
-        //    string ChangeProgram = program;
-
-        //    if (!string.IsNullOrEmpty(ChangeProgram))
-        //    {
-        //        // E2C-7375-B-01
-        //        // EXCELTECH-01-TOP
-        //        string[] prog = ChangeProgram.Split('-');
-        //        string type = string.Empty;
-        //        if (prog.Length > 2)
-        //        {
-        //            string source = prog[2];
-        //            type = new string(source.Take(1).ToArray());
-        //        }
-        //        string trackNumber = "0";
-
-        //        string side = type;
-
-        //        // 创建或追加到文件
-        //        using (StreamWriter writer = new StreamWriter(filePath, false))
-        //        {
-        //            // 写入表头
-        //            writer.WriteLine(string.Join(",", headers));
-
-        //            // 写入值
-        //            writer.WriteLine($"{ChangeProgram},{trackNumber},{side}");
-        //        }
-
-        //        //lastChangeProgram = program;
-
-        //        //OnShowMessage(Enum_LogType.Info, "处理 程序写入文件成功 ！");
-        //    }
-        //}
-        //catch (Exception ex)
-        //{
-
-        //    //OnShowMessage(Enum_LogType.Info, "处理 程序异常： " + ex.Message);
-        //}
-        #endregion
+        string testSN = "34264286427327JUYHGG";
+        // 优先使用当前条码 m_strCurrentCode，为空时使用测试条码
+        string barcode = string.IsNullOrEmpty(m_strCurrentCode) ? testSN : m_strCurrentCode;
 
         try
         {
-            //string strProgram = XPT_Data.m_strProgram;
-
-            //if (program != strProgram)
-            //{
-            //    string errorMsg = $"程序换型检测到不一致！当前程序：{program}，上一次程序：{strProgram}。流程已中断，禁止继续执行。";
-            //    MessageBox.Show(errorMsg);
-            //    return;
-            //}
-
-            MessageBox.Show("PROGRAM： " + program);
-
-
-            //  m_edcLogger.Info(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "程序名 ： " + program);
-            //  OnShowMessage(Enum_LogType.Info, "PROGRAM： " + program + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "和上一笔程序一样未换型，不生成新文件");
-
-
-            string path = m_Config.m_programFilePath;
-
-            // 获取当前日期
-            DateTime currentDate = DateTime.Now;
-            string fileName = $"rel0_{currentDate:yyyyMMddHHmmss}.csv"; // 例如：20230928_data.csv
-
-            // 完整文件路径
-            string filePath = Path.Combine(path, fileName);
-
-            MessageBox.Show("PROGRAM 路径： " + filePath);
-
-            // 数据要写入的内容
-            string[] headers = new string[]
+            // 若串口未打开，尝试按 m_Config 当前配置打开
+            if (serialPort1 == null || !serialPort1.IsOpen)
             {
-            "Program",
-            "TrackNumber",
-            "Side"
-            };
-
-            // 变量赋值
-            string ChangeProgram = program;
-
-            if (!string.IsNullOrEmpty(ChangeProgram))
-            {
-                //3608937XXX02A-NIO-AE_TOP ProductNo:3608937XXX02A-NIO  ProductVersion:AE  PCBSurfaceID:TOP
-                //string[] prog = ChangeProgram.Split('-');
-                //string type = string.Empty;
-                //if (prog.Length > 2)
-                //{
-                //    string source = prog[2];
-                //    type = new string(source.Take(1).ToArray());
-                //}
-
-                string type = string.Empty;
-
-                //string source = m_Config.m_side;
-
-                string source = "TOP";
-
-                if (source.Equals("TOP", StringComparison.OrdinalIgnoreCase))
+                if (!TryOpenSerialPort())
                 {
-                    type = "T";
+                    return; // TryOpenSerialPort 内部已提示失败原因
                 }
-                else
-                {
-                    type = "B";
-                }
-
-                string trackNumber = "0";
-
-                string side = type;
-
-                // 创建或追加到文件
-                using (StreamWriter writer = new StreamWriter(filePath, false))
-                {
-                    // 写入表头
-                    writer.WriteLine(string.Join(",", headers));
-
-                    // 写入值
-                    writer.WriteLine($"{ChangeProgram},{trackNumber},{side}");
-                }
-
-                MessageBox.Show("处理 程序写入文件成功 ！");
             }
+
+            // 按配置的前缀/后缀拼接报文
+            string prefix = m_Config?.m_strPrefix ?? string.Empty;
+            string suffix = m_Config?.m_strSuffix ?? string.Empty;
+            string payload = ResolveControlChars(prefix) + barcode + ResolveControlChars(suffix);
+
+            // 串口发送
+            serialPort1.Write(payload);
+            m_edcLogger?.Info($"SerialPort Send: [{prefix}]{barcode}[{suffix}]", null);
+
+            MessageBox.Show($"已通过 {serialPort1.PortName} @ {serialPort1.BaudRate} 发送：\r\n{barcode}",
+                "发送成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         catch (Exception ex)
         {
-
-            MessageBox.Show( "处理 程序异常： " + ex.Message);
+            m_edcLogger?.Error("SerialPort Send Error: " + ex.Message, ex, "btTest_Click", 0);
+            MessageBox.Show("串口发送失败: " + ex.Message, "错误",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-
     }
+
+    /// <summary>
+    /// 按 m_Config 当前串口配置打开 serialPort1。返回 true 表示已成功打开，false 表示失败（已提示用户）。
+    /// </summary>
+    private bool TryOpenSerialPort()
+    {
+        try
+        {
+            if (serialPort1 == null)
+            {
+                MessageBox.Show("SerialPort 对象未初始化。", "错误",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (m_Config == null)
+            {
+                MessageBox.Show("配置未加载，无法打开串口。", "错误",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (serialPort1.IsOpen)
+            {
+                return true;
+            }
+
+            // 应用参数（与 FrmSerialPortConfig.btnOk_Click 保持一致）
+            serialPort1.PortName = string.IsNullOrEmpty(m_Config.m_strcomPort) ? "COM 1" : m_Config.m_strcomPort;
+
+            if (int.TryParse(m_Config.m_strBaudRate, out int baud))
+                serialPort1.BaudRate = baud;
+            if (int.TryParse(m_Config.m_strDataBits, out int dataBits))
+                serialPort1.DataBits = dataBits;
+
+            if (Enum.TryParse<StopBits>(m_Config.m_strStopBits == "1.5" ? "OnePointFive" : m_Config.m_strStopBits, out StopBits stopBits))
+                serialPort1.StopBits = stopBits;
+
+            if (Enum.TryParse<Parity>(m_Config.m_strParity, out Parity parity))
+                serialPort1.Parity = parity;
+
+            serialPort1.Open();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            m_edcLogger?.Error("SerialPort Auto-Open Error: " + ex.Message, ex, "TryOpenSerialPort", 0);
+            MessageBox.Show("自动打开串口失败: " + ex.Message, "错误",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 把形如 "STX (0x02)" / "CR (0x0D)" / "CRLF (0x0D 0x0A)" / "ETX (0x03)" / "无" 的描述转换为对应控制字符，
+    /// 其它文本原样返回。空字符串直接返回空。
+    /// </summary>
+    private string ResolveControlChars(string token)
+    {
+        if (string.IsNullOrEmpty(token)) return string.Empty;
+        string t = token.Trim();
+        if (t.Equals("无", StringComparison.OrdinalIgnoreCase)) return string.Empty;
+
+        switch (t.ToUpperInvariant())
+        {
+            case "STX (0X02)": return "\u0002";
+            case "ETX (0X03)": return "\u0003";
+            case "CR (0X0D)": return "\r";
+            case "LF (0X0A)": return "\n";
+            case "CRLF (0X0D 0X0A)": return "\r\n";
+            default: return t;
+        }
+    }
+
     private XPT_ersaOnlineResponse GetResponse1(string message)
     {
         return JsonConvert.DeserializeObject<XPT_ersaOnlineResponse>(message);

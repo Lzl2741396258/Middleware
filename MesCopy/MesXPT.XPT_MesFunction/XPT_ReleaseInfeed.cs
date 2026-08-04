@@ -9,6 +9,7 @@ using System;
 using System.Data;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -16,6 +17,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MesXPT.XPT_MesFunction;
 
@@ -27,7 +29,7 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
 
     string lastChangeProgram = string.Empty;
     private readonly HttpClient _httpClient;
-
+    private SerialPort serialPort1;
     public XPT_ReleaseInfeed(XPT_Config i_Config, Inf_Logger i_edcLogger)
         : base(i_Config.m_lstMesFunction, i_edcLogger, i_Config.m_clsBasicSettings.m_enuMachineType, i_Config.m_clsDevice.m_strCameraNoRead)
     {
@@ -65,7 +67,7 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
            // SendProgram(base.m_Request.m_sttSolderingProgram.m_strName);
 
 
-            if (string.IsNullOrEmpty(base.m_Request.ma_edcIdentifier[0].m_strValue) || XPT_Data.m_byPass)
+            if (string.IsNullOrEmpty(base.m_Request.ma_edcIdentifier[0].m_strValue))
             {
                 
                 XPT_Data.m_strAlarmMessage += "条码为空";
@@ -119,7 +121,33 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
                         m_enuResultCode = Enum_ResponseCode.ok
                     };
                     OnShowMessage(Enum_LogType.Info, "Release Infeed  sucess: " + m_Config.m_strCode + base.r_enuComingRelease);
+                    try
+                    {
+                        // 若串口未打开，尝试按 m_Config 当前配置打开
+                        if (serialPort1 == null || !serialPort1.IsOpen)
+                        {
+                            if (!TryOpenSerialPort())
+                            {
+                                return Task.CompletedTask; // TryOpenSerialPort 内部已提示失败原因
+                            }
+                        }
 
+                        // 按配置的前缀/后缀拼接报文
+                        string prefix = m_Config?.m_strPrefix ?? string.Empty;
+                        string suffix = m_Config?.m_strSuffix ?? string.Empty;
+                        string payload = ResolveControlChars(prefix) + m_Config.m_strCode + ResolveControlChars(suffix);
+
+                        // 串口发送
+                        serialPort1.Write(payload);
+                        m_edcLogger?.Info($"SerialPort Send: [{prefix}]{m_Config.m_strCode}[{suffix}]", null);
+
+                        OnShowMessage(Enum_LogType.Info, $"已通过 {serialPort1.PortName} @ {serialPort1.BaudRate} 发送：\r\n{m_Config.m_strCode}");
+                    }
+                    catch (Exception ex)
+                    {
+                        m_edcLogger?.Error("SerialPort Send Error: " + ex.Message, ex, "Fun_blnConnectMesPlatform", 0);
+                        OnShowMessage(Enum_LogType.Error, "串口发送失败: " + ex.Message);
+                    }
                 }
                 else
                 {
@@ -151,6 +179,76 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
     private Response GetResponse(string message)
     {
         return JsonConvert.DeserializeObject<Response>(message);
+    }
+    /// <summary>
+    /// 按 m_Config 当前串口配置打开 serialPort1。返回 true 表示已成功打开，false 表示失败（已提示用户）。
+    /// 若 serialPort1 为 null，则自动创建新实例。
+    /// </summary>
+    private bool TryOpenSerialPort()
+    {
+        try
+        {
+            // serialPort1 未初始化时自动创建（与 FrmSettingPlatform.designer 中一致）
+            if (serialPort1 == null)
+            {
+                serialPort1 = new SerialPort();
+            }
+
+            if (m_Config == null)
+            {
+                OnShowMessage(Enum_LogType.Error, "配置未加载，无法打开串口。");
+                return false;
+            }
+
+            if (serialPort1.IsOpen)
+            {
+                return true;
+            }
+
+            // 应用参数（与 FrmSerialPortConfig.btnOk_Click 保持一致）
+            serialPort1.PortName = string.IsNullOrEmpty(m_Config.m_strcomPort) ? "COM 1" : m_Config.m_strcomPort;
+
+            if (int.TryParse(m_Config.m_strBaudRate, out int baud))
+                serialPort1.BaudRate = baud;
+            if (int.TryParse(m_Config.m_strDataBits, out int dataBits))
+                serialPort1.DataBits = dataBits;
+
+            if (Enum.TryParse<StopBits>(m_Config.m_strStopBits == "1.5" ? "OnePointFive" : m_Config.m_strStopBits, out StopBits stopBits))
+                serialPort1.StopBits = stopBits;
+
+            if (Enum.TryParse<Parity>(m_Config.m_strParity, out Parity parity))
+                serialPort1.Parity = parity;
+
+            serialPort1.Open();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            m_edcLogger?.Error("SerialPort Auto-Open Error: " + ex.Message, ex, "TryOpenSerialPort", 0);
+            OnShowMessage(Enum_LogType.Error, "自动打开串口失败: " + ex.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 把形如 "STX (0x02)" / "CR (0x0D)" / "CRLF (0x0D 0x0A)" / "ETX (0x03)" / "无" 的描述转换为对应控制字符，
+    /// 其它文本原样返回。空字符串直接返回空。
+    /// </summary>
+    private string ResolveControlChars(string token)
+    {
+        if (string.IsNullOrEmpty(token)) return string.Empty;
+        string t = token.Trim();
+        if (t.Equals("无", StringComparison.OrdinalIgnoreCase)) return string.Empty;
+
+        switch (t.ToUpperInvariant())
+        {
+            case "STX (0X02)": return "\u0002";
+            case "ETX (0X03)": return "\u0003";
+            case "CR (0X0D)": return "\r";
+            case "LF (0X0A)": return "\n";
+            case "CRLF (0X0D 0X0A)": return "\r\n";
+            default: return t;
+        }
     }
 
     private void SendProgram(string program)

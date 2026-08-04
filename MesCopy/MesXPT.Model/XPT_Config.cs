@@ -54,6 +54,27 @@ public class XPT_Config : Edc_ConfigBase
 	[XmlElement("comPort")]
 	public string m_strcomPort { get; set; }
 
+	[XmlElement("BaudRate")]
+	public string m_strBaudRate { get; set; }
+
+	[XmlElement("DataBits")]
+	public string m_strDataBits { get; set; }
+
+	[XmlElement("StopBits")]
+	public string m_strStopBits { get; set; }
+
+	[XmlElement("Parity")]
+	public string m_strParity { get; set; }
+
+	[XmlElement("Prefix")]
+	public string m_strPrefix { get; set; }
+
+	[XmlElement("Suffix")]
+	public string m_strSuffix { get; set; }
+
+	[XmlElement("TriggerChar")]
+	public string m_strTriggerChar { get; set; }
+
 	[XmlElement("ersaetx")]
 	public string m_strersa { get; set; }
 
@@ -88,20 +109,20 @@ public class XPT_Config : Edc_ConfigBase
 
 	public string m_snCode { get; set; }
 
-    public string m_CommandType { get; set; }//ÃüÁîÀàÐÍ
-    public string m_LocalTime { get; set; }//±¾µØÊ±¼ä
-    public string m_Line { get; set; }//²úÏßÃû³Æ
-    public string m_MachineCode { get; set; }//Éè±¸±àºÅ
-    public string m_Barcode { get; set; }//ÌõÂë
-    public string m_Lane { get; set; }//¹ìµÀÀàÐÍ
-    public string m_Layer { get; set; }//Ãæ±ð
-    public string m_Program { get; set; }//³ÌÐòÃû
+    public string m_CommandType { get; set; }//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public string m_LocalTime { get; set; }//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    public string m_Line { get; set; }//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public string m_MachineCode { get; set; }//ï¿½è±¸ï¿½ï¿½ï¿½
+    public string m_Barcode { get; set; }//ï¿½ï¿½ï¿½ï¿½
+    public string m_Lane { get; set; }//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public string m_Layer { get; set; }//ï¿½ï¿½ï¿½
+    public string m_Program { get; set; }//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    public string m_Account { get; set; }//µÇÂ½ÕËºÅ
-    public string m_RecipeName { get; set; }//Éè±¸Ãû³Æ
-	public string m_ResourceName { get; set; }//Éè±¸³ÌÐòÃû³Æ
+    public string m_Account { get; set; }//ï¿½ï¿½Â½ï¿½Ëºï¿½
+    public string m_RecipeName { get; set; }//ï¿½è±¸ï¿½ï¿½ï¿½ï¿½
+	public string m_ResourceName { get; set; }//ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    public string m_strITACMESType { get; set; } //Itac±êÖ¾
+    public string m_strITACMESType { get; set; } //Itacï¿½ï¿½Ö¾
 
 	public bool	m_ErsachooseRecipe { get; set; } = false;
     public string m_checkCompeletResult { get; set; }
