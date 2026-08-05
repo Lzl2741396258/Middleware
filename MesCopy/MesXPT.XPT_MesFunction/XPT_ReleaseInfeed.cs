@@ -64,10 +64,14 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
             m_edcLogger.Info(" 条码 : " + base.m_Request.ma_edcIdentifier[0].m_strValue);
             OnShowMessage(Enum_LogType.Info, "条码： " + base.m_Request.ma_edcIdentifier[0].m_strValue);
 
-           // SendProgram(base.m_Request.m_sttSolderingProgram.m_strName);
+            // SendProgram(base.m_Request.m_sttSolderingProgram.m_strName);
 
-
-            if (string.IsNullOrEmpty(base.m_Request.ma_edcIdentifier[0].m_strValue))
+            if (XPT_Data.m_byPass)
+            {
+                m_edcLogger.Info(" seletiv ： " + $"Release Infeed failed! 执行ByPass模式");
+                OnShowMessage(Enum_LogType.Info, $"Release Infeed : 执行ByPass模式");
+            }
+            else if (string.IsNullOrEmpty(base.m_Request.ma_edcIdentifier[0].m_strValue))
             {
                 
                 XPT_Data.m_strAlarmMessage += "条码为空";
@@ -85,17 +89,18 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
 
                 XPT_Data.m_result = false;
 
-                XPT_Data.m_resultReaseinfeed = "进板失败";
-                m_edcLogger.Info(" seletiv ： " + "Release Infeed failed! 设备不生产 执行bypass模式");
-                OnShowMessage(Enum_LogType.Info, "Release Infeed : " );
+                //XPT_Data.m_resultReaseinfeed = "进板失败";
+                m_edcLogger.Info(" seletiv ： " + $"Release Infeed failed! {XPT_Data.m_strAlarmMessage}");
+                OnShowMessage(Enum_LogType.Info, $"Release Infeed : {XPT_Data.m_strAlarmMessage}" );
             }
-            else { 
+            else 
+            { 
                 // 有条码将条码存入到GUI上
                 m_Config.m_strCode = base.m_Request.ma_edcIdentifier[0].m_strValue;
                 XPT_Data.m_strAlarmMessage = "当前条码为:" + m_Config.m_strCode + "---" + DateTime.Now.ToString();
 
                 XPT_Data.m_blnActiveSelectProgram = false;
-                XPT_Data.m_result = false;
+                XPT_Data.m_result = true;
                 OnShowMessage(Enum_LogType.Info, "上个流程执行结果: " + XPT_Data.m_result + m_Config.m_strCode + base.r_enuComingRelease);
                 //
                 var request = new ReadBarcode

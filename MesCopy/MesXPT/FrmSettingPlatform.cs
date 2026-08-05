@@ -107,7 +107,14 @@ public class FrmSettingPlatform : Form
         if (bool.TryParse(m_Config.m_byPass, out bool byPass))
         {
             cbByPass.Checked = byPass;
-            XPT_Data.m_byPass = true;
+            if (byPass)
+            {
+                XPT_Data.m_byPass = true;
+            }
+            else
+            {
+                XPT_Data.m_byPass = false;
+            }
         }
         else
         {
@@ -132,6 +139,14 @@ public class FrmSettingPlatform : Form
             m_Config.m_ersaDownLineUrl = tbErsaDownlineUrl.Text.Trim();
             m_Config.m_ersaOnlineUrl = tbErsaOnlineUrl.Text.Trim();
             m_Config.m_byPass = cbByPass.Checked.ToString();
+            if (m_Config.m_byPass == "True")
+            {
+                XPT_Data.m_byPass = true;
+            }
+            else
+            {
+                XPT_Data.m_byPass = false;
+            }
             XPT_Data.m_strProgram = m_Config.m_programFilePath;
 
             // 串口配置由弹窗内已临时写入 m_Config，这里统一落地
