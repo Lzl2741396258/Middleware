@@ -46,6 +46,10 @@ public class FrmSettingPlatform : Form
     private System.Windows.Forms.Timer timer1;
 
     private SerialPort serialPort1;
+
+    // 串口连接状态指示灯（放在顶部 toolStrip，紧挨"串口配置"按钮）
+    private Panel pnlSerialStatusLight;
+    private Label lblSerialStatusText;
     private FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
     private TextBox tbErsaOnlineUrl;
     private Label lbErsaOnlineURL;
@@ -72,6 +76,10 @@ public class FrmSettingPlatform : Form
     public FrmSettingPlatform(XPT_Config i_Config, Inf_Logger i_edcLogger, Edc_Account i_edcAccount)
     {
         InitializeComponent();
+        // 复用全局共享串口（FrmMain 启动时已打开，避免重复创建）
+        // 必须在 InitializeComponent 之后赋值，否则会被 designer 里的 new SerialPort 覆盖
+        serialPort1 = XPT_Data.SharedSerialPort;
+
         m_Config = i_Config;
         m_edcLogger = i_edcLogger;
         m_edcAccount = i_edcAccount;
@@ -128,6 +136,10 @@ public class FrmSettingPlatform : Form
             Height = 400,
             Width = 750
         };
+
+        // 订阅串口错误事件 + 初始化指示灯状态
+        serialPort1.ErrorReceived += serialPort1_ErrorReceived;
+        UpdateSerialPortStatus();
     }
 
     private void btnSave_Click(object sender, EventArgs e)
@@ -174,7 +186,7 @@ public class FrmSettingPlatform : Form
     {
         try
         {
-            using (FrmSerialPortConfig frm = new FrmSerialPortConfig(m_Config, serialPort1, m_edcLogger))
+            using (FrmSerialPortConfig frm = new FrmSerialPortConfig(m_Config, serialPort1, m_edcLogger, UpdateSerialPortStatus))
             {
                 frm.ShowDialog(this);
             }
@@ -233,7 +245,78 @@ public class FrmSettingPlatform : Form
 
     private void FrmSettingPlatform_FormClosed(object sender, FormClosedEventArgs e)
     {
-        serialPort1.Close();
+        // 取消 ErrorReceived 订阅，避免多次打开 FrmSettingPlatform 后重复触发指示灯刷新
+        if (serialPort1 != null)
+        {
+            serialPort1.ErrorReceived -= serialPort1_ErrorReceived;
+        }
+        // 共享串口由 FrmMain 生命周期管理，此处不再关闭
+    }
+
+    /// <summary>
+    /// 窗体被激活时刷新一次指示灯（处理从串口配置弹窗返回等场景的兜底刷新）。
+    /// </summary>
+    private void FrmSettingPlatform_Activated(object sender, EventArgs e)
+    {
+        UpdateSerialPortStatus();
+    }
+
+    /// <summary>
+    /// 串口底层错误（断线、溢出等）时刷新指示灯。
+    /// </summary>
+    private void serialPort1_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new SerialErrorReceivedEventHandler(serialPort1_ErrorReceived), sender, e);
+            return;
+        }
+        m_edcLogger?.Error("SerialPort ErrorReceived: " + e.EventType, null, "serialPort1_ErrorReceived", 0);
+        UpdateSerialPortStatus();
+    }
+
+    /// <summary>
+    /// 根据 serialPort1.IsOpen 刷新顶部指示灯与文本。
+    /// </summary>
+    public void UpdateSerialPortStatus()
+    {
+        try
+        {
+            bool isOpen = serialPort1 != null && serialPort1.IsOpen;
+            if (isOpen)
+            {
+                pnlSerialStatusLight.BackColor = Color.Lime;
+                lblSerialStatusText.Text = $"串口已连接 ({serialPort1.PortName} @ {serialPort1.BaudRate})";
+                lblSerialStatusText.ForeColor = Color.LimeGreen;
+            }
+            else
+            {
+                pnlSerialStatusLight.BackColor = Color.DimGray;
+                lblSerialStatusText.Text = "串口未连接";
+                lblSerialStatusText.ForeColor = Color.DimGray;
+            }
+        }
+        catch
+        {
+            pnlSerialStatusLight.BackColor = Color.DimGray;
+            lblSerialStatusText.Text = "串口未连接";
+            lblSerialStatusText.ForeColor = Color.DimGray;
+        }
+    }
+
+    /// <summary>
+    /// 指示灯 Paint：在 BackColor 基础上加一圈白色边框，让 LED 更立体、更显眼。
+    /// </summary>
+    private void pnlSerialStatusLight_Paint(object sender, PaintEventArgs e)
+    {
+        var panel = sender as Panel;
+        if (panel == null) return;
+        e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        using (var pen = new Pen(Color.White, 2))
+        {
+            // 留 1px 边距给白边，避免被 Region 裁掉
+            e.Graphics.DrawEllipse(pen, 1, 1, panel.Width - 3, panel.Height - 3);
+        }
     }
 
     private void label18_Click(object sender, EventArgs e)
@@ -323,6 +406,34 @@ public class FrmSettingPlatform : Form
             this.statusStrip1.Size = new System.Drawing.Size(1384, 22);
             this.statusStrip1.TabIndex = 28;
             this.statusStrip1.Text = "statusStrip1";
+            //
+            // pnlSerialStatusLight（圆形 LED 指示灯）
+            //
+            this.pnlSerialStatusLight = new System.Windows.Forms.Panel();
+            this.pnlSerialStatusLight.Name = "pnlSerialStatusLight";
+            this.pnlSerialStatusLight.Size = new System.Drawing.Size(24, 24);
+            this.pnlSerialStatusLight.BackColor = System.Drawing.Color.DimGray;
+            this.pnlSerialStatusLight.Margin = new System.Windows.Forms.Padding(8, 3, 2, 3);
+            this.pnlSerialStatusLight.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlSerialStatusLight_Paint);
+            // 设置圆形 Region，让 Panel 显示为 LED 圆点
+            {
+                var path = new System.Drawing.Drawing2D.GraphicsPath();
+                path.AddEllipse(0, 0, this.pnlSerialStatusLight.Width - 1, this.pnlSerialStatusLight.Height - 1);
+                this.pnlSerialStatusLight.Region = new System.Drawing.Region(path);
+            }
+            //
+            // lblSerialStatusText（指示灯旁的状态文字）
+            //
+            this.lblSerialStatusText = new System.Windows.Forms.Label();
+            this.lblSerialStatusText.Name = "lblSerialStatusText";
+            this.lblSerialStatusText.Text = "串口未连接";
+            this.lblSerialStatusText.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Bold);
+            this.lblSerialStatusText.ForeColor = System.Drawing.Color.DimGray;
+            this.lblSerialStatusText.AutoSize = true;
+            this.lblSerialStatusText.Margin = new System.Windows.Forms.Padding(2, 6, 4, 3);
+            // 把 LED + 文字作为 ToolStripControlHost 嵌入顶部工具栏
+            this.toolStrip1.Items.Add(new System.Windows.Forms.ToolStripControlHost(this.pnlSerialStatusLight));
+            this.toolStrip1.Items.Add(new System.Windows.Forms.ToolStripControlHost(this.lblSerialStatusText));
             // 
             // lbErsaOnlineURL
             // 
@@ -453,6 +564,7 @@ public class FrmSettingPlatform : Form
             this.Text = "Platform Settings";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmSettingPlatform_FormClosed);
             this.Load += new System.EventHandler(this.FrmSettingTcpip_Load);
+            this.Activated += new System.EventHandler(this.FrmSettingPlatform_Activated);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.groupBox4.ResumeLayout(false);
@@ -542,12 +654,14 @@ public class FrmSettingPlatform : Form
 
         try
         {
-            // 若串口未打开，尝试按 m_Config 当前配置打开
-            if (serialPort1 == null || !serialPort1.IsOpen)
+            // 若共享串口未打开，尝试按 m_Config 当前配置打开
+            if (XPT_Data.SharedSerialPort == null || !XPT_Data.SharedSerialPort.IsOpen)
             {
-                if (!TryOpenSerialPort())
+                if (!XPT_Data.OpenSharedSerialPort(m_Config, m_edcLogger, out string openErr))
                 {
-                    return; // TryOpenSerialPort 内部已提示失败原因
+                    MessageBox.Show("自动打开串口失败: " + openErr, "错误",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
             }
 
@@ -557,10 +671,10 @@ public class FrmSettingPlatform : Form
             string payload = ResolveControlChars(prefix) + barcode + ResolveControlChars(suffix);
 
             // 串口发送
-            serialPort1.Write(payload);
+            XPT_Data.SharedSerialPort.Write(payload);
             m_edcLogger?.Info($"SerialPort Send: [{prefix}]{barcode}[{suffix}]", null);
 
-            MessageBox.Show($"已通过 {serialPort1.PortName} @ {serialPort1.BaudRate} 发送：\r\n{barcode}",
+            MessageBox.Show($"已通过 {XPT_Data.SharedSerialPort.PortName} @ {XPT_Data.SharedSerialPort.BaudRate} 发送：\r\n{barcode}",
                 "发送成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         catch (Exception ex)
@@ -572,55 +686,12 @@ public class FrmSettingPlatform : Form
     }
 
     /// <summary>
-    /// 按 m_Config 当前串口配置打开 serialPort1。返回 true 表示已成功打开，false 表示失败（已提示用户）。
+    /// 已废弃：保留仅为兼容外部可能的反射调用。实际打开逻辑请使用 XPT_Data.OpenSharedSerialPort。
     /// </summary>
+    [Obsolete("请改用 XPT_Data.OpenSharedSerialPort")]
     private bool TryOpenSerialPort()
     {
-        try
-        {
-            if (serialPort1 == null)
-            {
-                MessageBox.Show("SerialPort 对象未初始化。", "错误",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (m_Config == null)
-            {
-                MessageBox.Show("配置未加载，无法打开串口。", "错误",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (serialPort1.IsOpen)
-            {
-                return true;
-            }
-
-            // 应用参数（与 FrmSerialPortConfig.btnOk_Click 保持一致）
-            serialPort1.PortName = string.IsNullOrEmpty(m_Config.m_strcomPort) ? "COM 1" : m_Config.m_strcomPort;
-
-            if (int.TryParse(m_Config.m_strBaudRate, out int baud))
-                serialPort1.BaudRate = baud;
-            if (int.TryParse(m_Config.m_strDataBits, out int dataBits))
-                serialPort1.DataBits = dataBits;
-
-            if (Enum.TryParse<StopBits>(m_Config.m_strStopBits == "1.5" ? "OnePointFive" : m_Config.m_strStopBits, out StopBits stopBits))
-                serialPort1.StopBits = stopBits;
-
-            if (Enum.TryParse<Parity>(m_Config.m_strParity, out Parity parity))
-                serialPort1.Parity = parity;
-
-            serialPort1.Open();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            m_edcLogger?.Error("SerialPort Auto-Open Error: " + ex.Message, ex, "TryOpenSerialPort", 0);
-            MessageBox.Show("自动打开串口失败: " + ex.Message, "错误",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return false;
-        }
+        return XPT_Data.OpenSharedSerialPort(m_Config, m_edcLogger, out _);
     }
 
     /// <summary>

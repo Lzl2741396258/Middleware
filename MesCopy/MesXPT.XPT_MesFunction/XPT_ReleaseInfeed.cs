@@ -29,7 +29,7 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
 
     string lastChangeProgram = string.Empty;
     private readonly HttpClient _httpClient;
-    private SerialPort serialPort1;
+
     public XPT_ReleaseInfeed(XPT_Config i_Config, Inf_Logger i_edcLogger)
         : base(i_Config.m_lstMesFunction, i_edcLogger, i_Config.m_clsBasicSettings.m_enuMachineType, i_Config.m_clsDevice.m_strCameraNoRead)
     {
@@ -128,12 +128,13 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
                     OnShowMessage(Enum_LogType.Info, "Release Infeed  sucess: " + m_Config.m_strCode + base.r_enuComingRelease);
                     try
                     {
-                        // 若串口未打开，尝试按 m_Config 当前配置打开
-                        if (serialPort1 == null || !serialPort1.IsOpen)
+                        // 若共享串口未打开，尝试按 m_Config 当前配置打开
+                        if (XPT_Data.SharedSerialPort == null || !XPT_Data.SharedSerialPort.IsOpen)
                         {
-                            if (!TryOpenSerialPort())
+                            if (!XPT_Data.OpenSharedSerialPort(m_Config, m_edcLogger, out string openErr))
                             {
-                                return Task.CompletedTask; // TryOpenSerialPort 内部已提示失败原因
+                                OnShowMessage(Enum_LogType.Error, "打开串口失败: " + openErr);
+                                return Task.CompletedTask;
                             }
                         }
 
@@ -143,10 +144,10 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
                         string payload = ResolveControlChars(prefix) + m_Config.m_strCode + ResolveControlChars(suffix);
 
                         // 串口发送
-                        serialPort1.Write(payload);
+                        XPT_Data.SharedSerialPort.Write(payload);
                         m_edcLogger?.Info($"SerialPort Send: [{prefix}]{m_Config.m_strCode}[{suffix}]", null);
 
-                        OnShowMessage(Enum_LogType.Info, $"已通过 {serialPort1.PortName} @ {serialPort1.BaudRate} 发送：\r\n{m_Config.m_strCode}");
+                        OnShowMessage(Enum_LogType.Info, $"已通过 {XPT_Data.SharedSerialPort.PortName} @ {XPT_Data.SharedSerialPort.BaudRate} 发送：\r\n{m_Config.m_strCode}");
                     }
                     catch (Exception ex)
                     {
@@ -184,55 +185,6 @@ public class XPT_ReleaseInfeed : ReleaseInfeed
     private Response GetResponse(string message)
     {
         return JsonConvert.DeserializeObject<Response>(message);
-    }
-    /// <summary>
-    /// 按 m_Config 当前串口配置打开 serialPort1。返回 true 表示已成功打开，false 表示失败（已提示用户）。
-    /// 若 serialPort1 为 null，则自动创建新实例。
-    /// </summary>
-    private bool TryOpenSerialPort()
-    {
-        try
-        {
-            // serialPort1 未初始化时自动创建（与 FrmSettingPlatform.designer 中一致）
-            if (serialPort1 == null)
-            {
-                serialPort1 = new SerialPort();
-            }
-
-            if (m_Config == null)
-            {
-                OnShowMessage(Enum_LogType.Error, "配置未加载，无法打开串口。");
-                return false;
-            }
-
-            if (serialPort1.IsOpen)
-            {
-                return true;
-            }
-
-            // 应用参数（与 FrmSerialPortConfig.btnOk_Click 保持一致）
-            serialPort1.PortName = string.IsNullOrEmpty(m_Config.m_strcomPort) ? "COM 1" : m_Config.m_strcomPort;
-
-            if (int.TryParse(m_Config.m_strBaudRate, out int baud))
-                serialPort1.BaudRate = baud;
-            if (int.TryParse(m_Config.m_strDataBits, out int dataBits))
-                serialPort1.DataBits = dataBits;
-
-            if (Enum.TryParse<StopBits>(m_Config.m_strStopBits == "1.5" ? "OnePointFive" : m_Config.m_strStopBits, out StopBits stopBits))
-                serialPort1.StopBits = stopBits;
-
-            if (Enum.TryParse<Parity>(m_Config.m_strParity, out Parity parity))
-                serialPort1.Parity = parity;
-
-            serialPort1.Open();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            m_edcLogger?.Error("SerialPort Auto-Open Error: " + ex.Message, ex, "TryOpenSerialPort", 0);
-            OnShowMessage(Enum_LogType.Error, "自动打开串口失败: " + ex.Message);
-            return false;
-        }
     }
 
     /// <summary>

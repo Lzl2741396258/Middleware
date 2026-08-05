@@ -19,6 +19,9 @@ public class FrmSerialPortConfig : Form
 
     private Inf_Logger m_edcLogger { get; }
 
+    // 串口状态变化回调（用于通知主窗口刷新指示灯）
+    private Action m_onStatusChanged;
+
     private TextBox tbComPort;
     private ComboBox cbBaudRate;
     private ComboBox cbDataBits;
@@ -39,11 +42,12 @@ public class FrmSerialPortConfig : Form
     private Label lblSuffix;
     private Label lblTriggerChar;
 
-    public FrmSerialPortConfig(XPT_Config i_Config, SerialPort i_serialPort, Inf_Logger i_edcLogger)
+    public FrmSerialPortConfig(XPT_Config i_Config, SerialPort i_serialPort, Inf_Logger i_edcLogger, Action onStatusChanged = null)
     {
         m_Config = i_Config;
         m_serialPort = i_serialPort;
         m_edcLogger = i_edcLogger;
+        m_onStatusChanged = onStatusChanged;
         InitializeComponent();
         LoadFromConfig();
     }
@@ -129,6 +133,9 @@ public class FrmSerialPortConfig : Form
 
                 MessageBox.Show($"串口已打开：{m_serialPort.PortName} @ {m_serialPort.BaudRate}", "成功",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // 通知主窗口刷新指示灯
+                m_onStatusChanged?.Invoke();
             }
 
             DialogResult = DialogResult.OK;
@@ -141,6 +148,9 @@ public class FrmSerialPortConfig : Form
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             // 打开失败时让弹窗保持打开，方便用户修改
             DialogResult = DialogResult.None;
+
+            // 通知主窗口刷新指示灯（仍为未连接）
+            m_onStatusChanged?.Invoke();
         }
     }
 

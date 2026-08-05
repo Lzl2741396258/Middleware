@@ -31,7 +31,39 @@ public class FrmMain : P_frmMain
 		Sub_ControlTsbtn(i_Config.m_clsBasicSettings.m_i32MainFormLevel);
 		i_Logger.Debug(" ersa frmMain softName" + i_Config.m_clsBasicSettings.m_strSoftName);
 
+		// 主窗体首次显示后打开共享串口（不阻塞启动，失败仅提示一次）
+		this.Shown += FrmMain_Shown;
     }
+
+	/// <summary>
+	/// 启动时按 m_Config 打开共享串口；失败弹窗一次（不阻塞后续流程，指示灯保持灰色）。
+	/// </summary>
+	private void FrmMain_Shown(object sender, EventArgs e)
+	{
+		// 只在第一次 Shown 时执行，避免最小化/恢复时重复触发
+		this.Shown -= FrmMain_Shown;
+
+		try
+		{
+			if (XPT_Data.OpenSharedSerialPort(m_Config, base.m_edcLogger, out string err))
+			{
+				m_edcLogger.Info($"Startup: serial port opened {XPT_Data.SharedSerialPort.PortName} @ {XPT_Data.SharedSerialPort.BaudRate}");
+			}
+			else
+			{
+				m_edcLogger.Warn("Startup: open serial port failed: " + err);
+				MessageBox.Show(
+					$"启动时打开串口失败：{err}\r\n\r\n可能原因：COM 口不存在、被其他程序占用、或参数错误。\r\n\r\n程序将继续运行，串口指示灯保持灰色。可在 \"Custom\" → \"串口配置\" 中修改后重试。",
+					"串口未连接",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Warning);
+			}
+		}
+		catch (Exception ex)
+		{
+			m_edcLogger.Error("Startup OpenSerialPort Unexpected Error: " + ex.Message, ex, "FrmMain_Shown", 0);
+		}
+	}
 
 	// Overwrite Initialize (Fac & show)
 	protected override void Sub_InitializeMesTask()
